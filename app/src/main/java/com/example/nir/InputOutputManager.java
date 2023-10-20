@@ -73,7 +73,7 @@ public class InputOutputManager implements Runnable {
                 final byte[] data = new byte[len];
                 mReadBuffer.get(data, 0, len);
                 listener.onNewData(data);
-                Log.e(TAG, "READ");
+//                Log.e(TAG, "READ");
             }
             mReadBuffer.clear();
         }
@@ -87,7 +87,7 @@ public class InputOutputManager implements Runnable {
                 mWriteBuffer.rewind();
                 mWriteBuffer.get(outBuff, 0, len);
                 mWriteBuffer.clear();
-                Log.e(TAG, "WRITE");
+//                Log.e(TAG, "WRITE");
             }
         }
         if (outBuff != null) {

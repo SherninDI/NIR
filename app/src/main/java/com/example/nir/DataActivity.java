@@ -10,18 +10,26 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 public class DataActivity extends AppCompatActivity {
+    private final String TAG = DataActivity.class.getSimpleName();
 
+    Button button;
+
+    private DatabaseAdapter databaseAdapter;
+    private List<String> groups = new ArrayList<String>();
+    private List<String> subgroups = new ArrayList<String>();
     private static final String ACTION_USB_PERMISSION = "com.android.example.USB_PERMISSION";
-    private final String TAG = MainActivity.class.getSimpleName();
     private final ExecutorService mExecutor = Executors.newSingleThreadExecutor();
     private final BroadcastReceiver usbReceiver = new BroadcastReceiver() {
         public void onReceive(Context context, Intent intent) {
@@ -81,6 +89,25 @@ public class DataActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_data);
+
+        button = findViewById(R.id.button1);
+
+        databaseAdapter = new DatabaseAdapter(this);
+        databaseAdapter.createDataBase();
+        databaseAdapter.openDataBase();
+
+
+
+        button.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                subgroups = databaseAdapter.getAllSubgroups(1);
+                for (String subgroup: subgroups) {
+                    Log.d(TAG,subgroup);
+                }
+            }
+        });
+
         usbManager = (UsbManager) getSystemService(Context.USB_SERVICE);
         UsbDevice usbDevice = findDevice();
         PendingIntent mPermissionIntent = PendingIntent.getBroadcast(this, 0, new Intent(ACTION_USB_PERMISSION), 0);
@@ -121,6 +148,7 @@ public class DataActivity extends AppCompatActivity {
                 }
             }
         }
+
     }
 
 
@@ -147,12 +175,13 @@ public class DataActivity extends AppCompatActivity {
             stopIoManager();
             usbConnection.close();
         }
+        databaseAdapter.close();
     }
 
     private void updateReceivedData(byte[] data) {
         final String message = "Read " + data.length + " bytes: \n"
                 + HexDump.dumpHexString(data) + "\n\n";
-        Log.d(TAG, message);
+//        Log.d(TAG, message);
     }
 
 //    public void onClickButtonSend(View view) {

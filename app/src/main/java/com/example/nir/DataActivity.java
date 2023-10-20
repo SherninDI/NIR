@@ -14,17 +14,18 @@ import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
+import java.util.*;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 public class DataActivity extends AppCompatActivity {
     private final String TAG = DataActivity.class.getSimpleName();
-
-    Button button;
+    Button send;
+    Button receive;
+    Button add;
+    Button save;
+    Button reset;
+    Button cancel;
 
     private DatabaseAdapter databaseAdapter;
     private List<String> groups = new ArrayList<String>();
@@ -63,6 +64,7 @@ public class DataActivity extends AppCompatActivity {
             DataActivity.this.runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
+
                     DataActivity.this.updateReceivedData(data);
                 }
             });
@@ -85,28 +87,50 @@ public class DataActivity extends AppCompatActivity {
         return null;
     }
 
+    Timer timer = new Timer();
+    TimerTask timerTask = new TimerTask() {
+        @Override
+        public void run() {
+//            commandsHandler.obtainMessage(SYS_NOP).sendToTarget();
+            Log.d(TAG, "signal");
+        }
+    };
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_data);
 
-        button = findViewById(R.id.button1);
+        send = findViewById(R.id.send);
+        receive = findViewById(R.id.receive);
+        add = findViewById(R.id.add);
+        save = findViewById(R.id.save);
+        reset = findViewById(R.id.reset);
+        cancel = findViewById(R.id.cancel);
 
         databaseAdapter = new DatabaseAdapter(this);
         databaseAdapter.createDataBase();
         databaseAdapter.openDataBase();
 
-
-
-        button.setOnClickListener(new View.OnClickListener() {
+        add.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                subgroups = databaseAdapter.getAllSubgroups(1);
-                for (String subgroup: subgroups) {
-                    Log.d(TAG,subgroup);
-                }
+                Intent intent = new Intent(getApplicationContext(), GroupActivity.class);
+                startActivity(intent);
             }
         });
+
+//        button.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//                Intent intent = new Intent(getApplicationContext(), GroupActivity.class);
+//                startActivity(intent);
+////                subgroups = databaseAdapter.getAllSubgroups(1);
+////                for (String subgroup: subgroups) {
+////                    Log.d(TAG,subgroup);
+////                }
+//            }
+//        });
 
         usbManager = (UsbManager) getSystemService(Context.USB_SERVICE);
         UsbDevice usbDevice = findDevice();
@@ -165,6 +189,8 @@ public class DataActivity extends AppCompatActivity {
             Log.i(TAG, "Starting io manager ..");
             inputOutputManager = new InputOutputManager(inEndpoint, outEndpoint, usbConnection, listener);
             mExecutor.submit(inputOutputManager);
+
+            timer.scheduleAtFixedRate(timerTask,100,400);
         } else Toast.makeText(this, "mConnection == null", Toast.LENGTH_LONG).show();
     }
 
@@ -174,6 +200,8 @@ public class DataActivity extends AppCompatActivity {
         if (usbManager != null) {
             stopIoManager();
             usbConnection.close();
+            timer.cancel();
+            unregisterReceiver(usbReceiver);
         }
         databaseAdapter.close();
     }
@@ -181,7 +209,7 @@ public class DataActivity extends AppCompatActivity {
     private void updateReceivedData(byte[] data) {
         final String message = "Read " + data.length + " bytes: \n"
                 + HexDump.dumpHexString(data) + "\n\n";
-//        Log.d(TAG, message);
+        Log.d(TAG, message);
     }
 
 //    public void onClickButtonSend(View view) {

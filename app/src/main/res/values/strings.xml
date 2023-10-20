@@ -7,9 +7,9 @@
     <string name="waiting">Ожидание устройства…</string>
     <string name="device_found">Устройство обнаружено:\n%1$s</string>
     <string name="device_not_found">Устройство не обнаружено</string>
-    <string name="device_not_found_content">Характеристики устройства:\nНе доступны</string>
+    <string name="device_not_found_content">Не доступны</string>
     <string name="device_found_chars">Характеристики устройства:</string>
-    <string name="device_found_content"> Имя производителя %1$s\n
+    <string name="device_found_content">Имя производителя %1$s\n
         ID устройства %2$d\n
         ID продукта %3$d\n
         Vendor ID устройства %4$d\n
@@ -21,15 +21,14 @@
         Количество интерфейсов %10$d\n
     </string>
 
+    <string name="send_button">Отправить</string>
+    <string name="receive_button">Получить</string>
+    <string name="cancel_button">Отменить</string>
+    <string name="reset_button">Сбросить</string>
+    <string name="add_button">Добавить</string>
+    <string name="save_button">Сохранить</string>
 
-    <string name="refreshing">Refreshing…</string>
-    <string name="send_button">Send</string>
-    <string name="save">Сохранить</string>
-    <string name="add">Добавить</string>
-    <string name="send">Отправить</string>
-    <string name="reset">Сбросить</string>
-    <string name="get">Получить</string>
-    <string name="cancel">Отменить</string>
+
 
     <string name="text_transmit_hint">text to transmit</string>
     <!-- TODO: Remove or change this placeholder text -->

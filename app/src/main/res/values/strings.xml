@@ -1,6 +1,6 @@
 <resources>
     <string name="app_name">НИР</string>
-    <string name="data">Данные</string>
+    <string name="data">Группы воздействий</string>
 
     <string name="connect_button">Подключиться</string>
     <string name="refresh_button">Обновить</string>
@@ -9,25 +9,18 @@
     <string name="device_not_found">Устройство не обнаружено</string>
     <string name="device_not_found_content">Не доступны</string>
     <string name="device_found_chars">Характеристики устройства:</string>
-    <string name="device_found_content">Имя производителя %1$s\n
-        ID устройства %2$d\n
-        ID продукта %3$d\n
-        Vendor ID устройства %4$d\n
-        Версия %5$s\n
-        Серийный номер %6$s\n
-        Протокол %7$d\n
-        Класс %8$d\n
-        Подкласс %9$d\n
-        Количество интерфейсов %10$d\n
-    </string>
-
+    <string name="device_found_content">Имя производителя %1$s\nID устройства %2$d\nID продукта %3$d\nVendor ID устройства %4$d\nВерсия %5$s\nСерийный номер %6$s\nПротокол %7$d\nКласс %8$d\nПодкласс %9$d\nКоличество интерфейсов %10$d\n</string>
     <string name="send_button">Отправить</string>
     <string name="receive_button">Получить</string>
     <string name="cancel_button">Отменить</string>
     <string name="reset_button">Сбросить</string>
     <string name="add_button">Добавить</string>
     <string name="save_button">Сохранить</string>
-
+    <string name="delete_button">Удалить</string>
+    <string name="add_ept_button">Добавить воздействие</string>
+    <string name="settings_button">Настройки</string>
+    <string name="name_hint">Введите название группы</string>
+    <string name="ept_title">Список воздействий</string>
 
 
     <string name="text_transmit_hint">text to transmit</string>

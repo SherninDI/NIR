@@ -5,13 +5,101 @@
         xmlns:app="http://schemas.android.com/apk/res-auto"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:padding="10dp"
         tools:context=".GroupActivity">
 
-    <TextView
-            android:text="TextView"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content" android:id="@+id/textView"
+    <EditText
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:inputType="text"
+            android:ems="10"
+            android:id="@+id/text_name"
+            android:focusableInTouchMode="true"
             app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintBottom_toBottomOf="parent" app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"/>
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintBottom_toTopOf="@id/ept_title"
+    />
+
+    <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/ept_title"
+            android:text="@string/ept_title"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintBottom_toTopOf="@id/ept_list"
+            app:layout_constraintTop_toBottomOf="@id/text_name"/>
+
+
+    <android.support.v7.widget.RecyclerView
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:id="@+id/ept_list"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintBottom_toTopOf="@id/add_ept"
+            app:layout_constraintTop_toBottomOf="@id/ept_title"/>
+
+    <Button
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/add_ept"
+            android:layout_marginBottom="10dp"
+            android:text="@string/add_ept_button"
+            android:background="@drawable/button_background"
+            app:layout_constraintTop_toBottomOf="@id/ept_list"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintBottom_toTopOf="@id/settings"
+           />
+
+    <Button
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/settings"
+            android:layout_marginBottom="10dp"
+            android:text="@string/settings_button"
+            android:background="@drawable/button_background"
+            app:layout_constraintTop_toBottomOf="@id/add_ept"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintBottom_toTopOf="@id/grid1"
+    />
+
+    <GridLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:columnCount="2"
+            android:layout_marginBottom="10dp"
+            android:id="@+id/grid1"
+            app:layout_constraintTop_toBottomOf="@id/settings"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent">
+
+        <Button
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:id="@+id/save_changes"
+                android:text="@string/save_button"
+                android:layout_column="0"
+                android:layout_marginEnd="5dp"
+                android:layout_gravity="center|fill"
+                android:layout_columnWeight="1"
+                android:background="@drawable/button_background"/>
+        <Button
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:id="@+id/delete"
+                android:text="@string/delete_button"
+                android:layout_column="1"
+                android:layout_marginStart="5dp"
+                android:layout_gravity="center|fill"
+                android:layout_columnWeight="1"
+                android:background="@drawable/button_background"/>
+    </GridLayout>
+
+
+
 </android.support.constraint.ConstraintLayout>

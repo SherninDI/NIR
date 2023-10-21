@@ -82,16 +82,16 @@ public class MainActivity extends AppCompatActivity {
                     device.getDeviceSubclass(),
                     device.getInterfaceCount()
             ));
-//            for (int intf = 0; intf < device.getInterfaceCount(); intf++) {
-//                UsbInterface usbInterface = device.getInterface(intf);
-//                String inter = "Протокол" + usbInterface.getName() + "\n";
-//                chars.append(inter).append(usbInterface.getInterfaceProtocol()).append("\n").append(usbInterface.getEndpointCount()).append("\n");
-//                for (int nEp = 0; nEp < usbInterface.getEndpointCount(); nEp++) {
-//                    UsbEndpoint tmpEndpoint = usbInterface.getEndpoint(nEp);
-//                    chars.append(tmpEndpoint.getType()).append("\n").append(tmpEndpoint.getDirection()).append("\n").append(tmpEndpoint.getMaxPacketSize()).append("\n");
-//                }
-//
-//            }
+            for (int intf = 0; intf < device.getInterfaceCount(); intf++) {
+                UsbInterface usbInterface = device.getInterface(intf);
+                String inter = "Протокол" + usbInterface.getName() + "\n";
+                chars.append(inter).append(usbInterface.getInterfaceProtocol()).append("\n").append(usbInterface.getEndpointCount()).append("\n");
+                for (int nEp = 0; nEp < usbInterface.getEndpointCount(); nEp++) {
+                    UsbEndpoint tmpEndpoint = usbInterface.getEndpoint(nEp);
+                    chars.append(tmpEndpoint.getType()).append("\n").append(tmpEndpoint.getDirection()).append("\n").append(tmpEndpoint.getMaxPacketSize()).append("\n");
+                }
+
+            }
 
             deviceText.setText(getString(R.string.device_found, device.getProductName()));
 //            contentText.setMovementMethod(new ScrollingMovementMethod());

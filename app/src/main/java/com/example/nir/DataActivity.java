@@ -8,12 +8,16 @@ import android.content.IntentFilter;
 import android.hardware.usb.*;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.*;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -27,8 +31,11 @@ public class DataActivity extends AppCompatActivity {
     Button reset;
     Button cancel;
 
+    RecyclerView groupList;
+    GroupAdapter groupAdapter;
+    public List<String> groups = new ArrayList<>();
+
     private DatabaseAdapter databaseAdapter;
-    private List<String> groups = new ArrayList<String>();
     private List<String> subgroups = new ArrayList<String>();
     private static final String ACTION_USB_PERMISSION = "com.android.example.USB_PERMISSION";
     private final ExecutorService mExecutor = Executors.newSingleThreadExecutor();
@@ -92,7 +99,7 @@ public class DataActivity extends AppCompatActivity {
         @Override
         public void run() {
 //            commandsHandler.obtainMessage(SYS_NOP).sendToTarget();
-            Log.d(TAG, "signal");
+//            Log.d(TAG, "signal");
         }
     };
 
@@ -101,6 +108,9 @@ public class DataActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_data);
 
+        File file = new File(this.getFilesDir(), "groups.grf");
+        FileHandler fileHandler = new FileHandler(file);
+
         send = findViewById(R.id.send);
         receive = findViewById(R.id.receive);
         add = findViewById(R.id.add);
@@ -108,15 +118,59 @@ public class DataActivity extends AppCompatActivity {
         reset = findViewById(R.id.reset);
         cancel = findViewById(R.id.cancel);
 
+        groupList = findViewById(R.id.group_list);
+
         databaseAdapter = new DatabaseAdapter(this);
         databaseAdapter.createDataBase();
         databaseAdapter.openDataBase();
 
+        groups = databaseAdapter.getAllGroups();
+        groupAdapter = new GroupAdapter(this, groups);
+        groupList.setAdapter(groupAdapter);
+
+        groupAdapter.setOnGroupClickListener(new GroupAdapter.GroupClickListener() {
+            @Override
+            public void onGroupClick(int position, View itemView) {
+                TextView textView = (TextView) itemView.findViewById(R.id.tvGroupName) ;
+//                Log.e(TAG, textView.getText().toString());
+                Intent intent = new Intent(DataActivity.this, GroupActivity.class);
+                intent.putExtra("group", position);
+                intent.putExtra("name", textView.getText().toString());
+                startActivity(intent);
+            }
+        });
+
         add.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(getApplicationContext(), GroupActivity.class);
+                Intent intent = new Intent(DataActivity.this, GroupActivity.class);
+                intent.putExtra("size", groups.size());
                 startActivity(intent);
+//                Log.e(TAG, String.valueOf(groups.size()));
+            }
+        });
+
+        save.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                try {
+                // Записываем все байты в файл
+                    byte[] allBytes = new byte[51200];
+                    fileHandler.writeBytes(allBytes);
+
+                // Записываем данные в указанную позицию файла с шагом 512 байт
+                    byte[] data = "Hello World!".getBytes();
+                    fileHandler.writeBytesToPosition(data, 512);
+
+                // Читаем данные с указанной позиции файла с заданной длиной и шагом 512 байт
+                    byte[] readData = fileHandler.readBytesFromPosition(12, 512);
+                    System.out.println(new String(readData));
+                } catch (IOException e) {
+                    e.printStackTrace();
+                } finally {
+                // Закрываем файл
+                    fileHandler.close();
+                }
             }
         });
 
@@ -175,7 +229,6 @@ public class DataActivity extends AppCompatActivity {
 
     }
 
-
     private void stopIoManager() {
         if (inputOutputManager != null) {
             Log.i(TAG, "Stopping io manager ..");
@@ -209,7 +262,7 @@ public class DataActivity extends AppCompatActivity {
     private void updateReceivedData(byte[] data) {
         final String message = "Read " + data.length + " bytes: \n"
                 + HexDump.dumpHexString(data) + "\n\n";
-        Log.d(TAG, message);
+//        Log.d(TAG, message);
     }
 
 //    public void onClickButtonSend(View view) {

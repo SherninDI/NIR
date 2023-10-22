@@ -14,7 +14,7 @@
         <activity
                 android:name=".GroupActivity"
                 android:exported="false"
-                android:windowSoftInputMode="stateHidden"/>
+                android:windowSoftInputMode="adjustResize"/>
         <activity
                 android:name=".DataActivity"
                 android:exported="false"

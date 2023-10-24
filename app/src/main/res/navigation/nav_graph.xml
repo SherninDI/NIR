@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+            xmlns:app="http://schemas.android.com/apk/res-auto"
+            xmlns:tools="http://schemas.android.com/tools"
+            android:id="@+id/nav_graph"
+            app:startDestination="@id/GroupSettingsFragment">
+
+    <fragment
+            android:id="@+id/GroupDataFragment"
+            android:name="com.example.nir.GroupDataFragment"
+            tools:layout="@layout/fragment_group_data">
+
+        <action
+                android:id="@+id/action_GroupDataFragment_to_GroupSettingsFragment"
+                app:destination="@id/GroupSettingsFragment"/>
+        <action
+                android:id="@+id/action_GroupDataFragment_to_GroupEptFragment"
+                app:destination="@id/GroupEptFragment"/>
+    </fragment>
+    <fragment
+            android:id="@+id/GroupSettingsFragment"
+            android:name="com.example.nir.GroupSettingsFragment"
+            tools:layout="@layout/fragment_group_settings">
+
+        <action
+                android:id="@+id/action_GroupSettingsFragment_to_GroupDataFragment"
+                app:destination="@id/GroupDataFragment"/>
+    </fragment>
+
+    <fragment
+            android:id="@+id/GroupEptFragment"
+            android:name="com.example.nir.GroupEptFragment"
+            tools:layout="@layout/fragment_group_ept">
+
+        <action
+                android:id="@+id/action_GroupEptFragment_to_GroupDataFragment"
+                app:destination="@id/GroupDataFragment"/>
+    </fragment>
+</navigation>

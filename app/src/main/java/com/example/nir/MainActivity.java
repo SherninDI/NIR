@@ -90,14 +90,10 @@ public class MainActivity extends AppCompatActivity {
                     UsbEndpoint tmpEndpoint = usbInterface.getEndpoint(nEp);
                     chars.append(tmpEndpoint.getType()).append("\n").append(tmpEndpoint.getDirection()).append("\n").append(tmpEndpoint.getMaxPacketSize()).append("\n");
                 }
-
             }
-
             deviceText.setText(getString(R.string.device_found, device.getProductName()));
 //            contentText.setMovementMethod(new ScrollingMovementMethod());
             contentText.setText(chars.toString());
-
-
         }
         return device;
     }

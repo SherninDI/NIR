@@ -1,7 +1,6 @@
 <resources>
     <string name="app_name">НИР</string>
     <string name="data">Группы воздействий</string>
-
     <string name="connect_button">Подключиться</string>
     <string name="refresh_button">Обновить</string>
     <string name="waiting">Ожидание устройства…</string>
@@ -9,7 +8,10 @@
     <string name="device_not_found">Устройство не обнаружено</string>
     <string name="device_not_found_content">Не доступны</string>
     <string name="device_found_chars">Характеристики устройства:</string>
-    <string name="device_found_content">Имя производителя %1$s\nID устройства %2$d\nID продукта %3$d\nVendor ID устройства %4$d\nВерсия %5$s\nСерийный номер %6$s\nПротокол %7$d\nКласс %8$d\nПодкласс %9$d\nКоличество интерфейсов %10$d\n</string>
+    <string name="device_found_content">Имя производителя %1$s\nID устройства %2$d\nID продукта %3$d\nVendor ID
+        устройства %4$d\nВерсия %5$s\nСерийный номер %6$s\nПротокол %7$d\nКласс %8$d\nПодкласс %9$d\nКоличество
+        интерфейсов %10$d\n
+    </string>
     <string name="send_button">Отправить</string>
     <string name="receive_button">Получить</string>
     <string name="cancel_button">Отменить</string>
@@ -20,19 +22,40 @@
     <string name="add_ept_button">Добавить воздействие</string>
     <string name="settings_button">Настройки</string>
     <string name="name_hint">Введите название группы</string>
+    <string name="time_hint">Введите общее время группы</string>
     <string name="ept_title">Список воздействий</string>
+    <string name="group">Группа: %1$s</string>
+    <string name="new_group">Новая группа</string>
+    <string name="group_settings">Настройки группы: %1$s</string>
+    <string name="new_group_settings">Настройки новой группы</string>
+    <string name="ept_settings">Настройки воздействия: %1$s</string>
+    <string name="new_ept_settings">Настройки нового воздействия</string>
 
+    <string name="mode_text">Режим исполнения группы</string>
+    <string name="mode_serial">Последовательное исполнение</string>
+    <string name="mode_cycle">Циклическое исполнение</string>
+    <string name="mode_complex">Комплексное исполнение</string>
+    <string name="spectre_text">Расширение спектра программ</string>
+    <string name="spectre_en1">Включить 1</string>
+    <string name="spectre_en2">Включить 2</string>
+    <string name="spectre_dis">Выключить</string>
+    <string name="freq_text">Ограничение частоты, Гц</string>
+    <string name="freq_1100">1100 Гц</string>
+    <string name="freq_1200">1200 Гц</string>
+    <string name="freq_1500">1500 Гц</string>
+    <string name="freq_15000">15000 Гц</string>
 
-    <string name="text_transmit_hint">text to transmit</string>
-    <!-- TODO: Remove or change this placeholder text -->
-    <string name="hello_blank_fragment">Hello blank fragment</string>
-    <string name="title_activity_ept">EptActivity</string>
+    <string name="ampl_hint">Введите амплитуду</string>
+    <string name="step_time_hint">Введите время шага</string>
+    <string name="code_hint">Введите код или выберете из справочника</string>
+    <string name="type_text">Тип записи</string>
+    <string name="codes">Справочник</string>
+    <string name="search_text">Введите название или код</string>
     <!-- Strings used for fragments for navigation -->
-    <string name="first_fragment_label">First Fragment</string>
-    <string name="second_fragment_label">Second Fragment</string>
     <string name="next">Next</string>
     <string name="previous">Previous</string>
 
     <string name="hello_first_fragment">Hello first fragment</string>
     <string name="hello_second_fragment">Hello second fragment. Arg: %1$s</string>
+    <string name="title_activity_group_data">GroupDataActivity</string>
 </resources>

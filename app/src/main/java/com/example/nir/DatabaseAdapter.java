@@ -77,7 +77,7 @@ public class DatabaseAdapter {
         return groups;
     }
 
-    public List<String> getAllEpt(int id) {
+    public List<String> getAllEptById(int id) {
         List<String> subgroups = new ArrayList<>();
         String sql = "SELECT * FROM sub_groups WHERE group_id=" + (id + 1) + ";";
         Cursor cursor = getData(sql);
@@ -94,6 +94,20 @@ public class DatabaseAdapter {
                 subgroups.add(name);
             }
             cursor1.close();
+        }
+        cursor.close();
+        return subgroups;
+    }
+
+    public List<String> getAllEpt() {
+        List<String> subgroups = new ArrayList<>();
+        String sql = "SELECT * FROM sub_groups;";
+        Cursor cursor = getData(sql);
+        while (cursor.moveToNext()) {
+            int subgroup_id = cursor.getInt(0);
+            int group_id = cursor.getInt(1);
+            String name = cursor.getString(2);
+            subgroups.add(name);
         }
         cursor.close();
         return subgroups;

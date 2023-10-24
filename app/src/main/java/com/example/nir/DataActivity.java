@@ -33,7 +33,7 @@ public class DataActivity extends AppCompatActivity {
 
     RecyclerView groupList;
     GroupAdapter groupAdapter;
-    public List<String> groups = new ArrayList<>();
+    private List<String> groups = new ArrayList<>();
 
     private DatabaseAdapter databaseAdapter;
     private List<String> subgroups = new ArrayList<String>();
@@ -63,8 +63,6 @@ public class DataActivity extends AppCompatActivity {
     private UsbEndpoint outEndpoint;
     private UsbDeviceConnection usbConnection;
     private InputOutputManager inputOutputManager;
-    private TextView mProgressBarTitle;
-    private TextView mDumpTextView;
     InputOutputManager.Listener listener = new InputOutputManager.Listener() {
         @Override
         public void onNewData(final byte[] data) {
@@ -133,8 +131,9 @@ public class DataActivity extends AppCompatActivity {
             public void onGroupClick(int position, View itemView) {
                 TextView textView = (TextView) itemView.findViewById(R.id.tvGroupName) ;
 //                Log.e(TAG, textView.getText().toString());
-                Intent intent = new Intent(DataActivity.this, GroupActivity.class);
+                Intent intent = new Intent(DataActivity.this, GroupDataActivity.class);
                 intent.putExtra("group", position);
+                intent.putExtra("new", false);
                 intent.putExtra("name", textView.getText().toString());
                 startActivity(intent);
             }
@@ -143,7 +142,8 @@ public class DataActivity extends AppCompatActivity {
         add.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(DataActivity.this, GroupActivity.class);
+                Intent intent = new Intent(DataActivity.this, GroupDataActivity.class);
+                intent.putExtra("new", true);
                 intent.putExtra("size", groups.size());
                 startActivity(intent);
 //                Log.e(TAG, String.valueOf(groups.size()));

@@ -12,9 +12,10 @@
             android:theme="@style/Theme.Nir"
             tools:targetApi="31">
         <activity
-                android:name=".GroupActivity"
+                android:name=".GroupDataActivity"
                 android:exported="false"
-                android:windowSoftInputMode="adjustResize"/>
+                android:windowSoftInputMode="adjustResize"
+                android:theme="@style/Theme.Nir.NoActionBar"/>
         <activity
                 android:name=".DataActivity"
                 android:exported="false"

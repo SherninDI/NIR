@@ -15,6 +15,8 @@ import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.concurrent.ExecutorService;
@@ -38,6 +40,17 @@ public class MainActivity extends AppCompatActivity {
         refresh = findViewById(R.id.refresh);
         deviceText = findViewById(R.id.device);
         contentText = findViewById(R.id.content);
+
+        File file = new File(this.getFilesDir(), "groups.grf");
+        FileHandler fileHandler = new FileHandler(file);
+//        byte[] allBytes = new byte[51200];
+//        try {
+//            fileHandler.writeBytes(allBytes);
+//        } catch (IOException e) {
+//            e.printStackTrace();
+//        } finally {
+//            fileHandler.close();
+//        }
 
         usbDevice = getDevice();
         connect.setOnClickListener(new View.OnClickListener() {

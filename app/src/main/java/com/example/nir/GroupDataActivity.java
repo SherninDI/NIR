@@ -38,7 +38,6 @@ public class GroupDataActivity extends AppCompatActivity implements GroupSetting
 
         setSupportActionBar(binding.toolbar);
         NavController navController = Navigation.findNavController(this, R.id.nav_host_fragment_content_group_data);
-        Log.e(TAG, String.valueOf(R.id.nav));
         Bundle bundle = getIntent().getExtras();
 //        if (bundle != null) {
 //            if (bundle.getBoolean("new")) {

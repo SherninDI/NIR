@@ -25,6 +25,9 @@ public class GroupDataFragment extends Fragment {
     private RecyclerView eptList;
     private EptAdapter eptAdapter;
 
+    private int position;
+    private int ept_position;
+
     @Override
     public View onCreateView(
             LayoutInflater inflater, ViewGroup container,
@@ -45,28 +48,39 @@ public class GroupDataFragment extends Fragment {
         databaseAdapter.createDataBase();
         databaseAdapter.openDataBase();
 
-        Bundle bundle = Objects.requireNonNull(getActivity()).getIntent().getExtras();
+        Bundle bundle = getArguments();
         if (bundle != null) {
-            if (bundle.getBoolean("new")) {
-                getActivity().setTitle(getString(R.string.new_group));
-                ept.clear();
-            } else {
-                int id = bundle.getInt("group");
-                String name = bundle.getString("name");
-                ept.clear();
-                ept = databaseAdapter.getAllEptById(id);
-                getActivity().setTitle(getString(R.string.group, name));
-                eptAdapter = new EptAdapter(getActivity(), ept);
-                eptList.setAdapter(eptAdapter);
-            }
-        } else {
-
+            position = bundle.getInt("group_position");
         }
+        Log.e(TAG, String.valueOf(position));
+
+
+
+//        Bundle bundle = Objects.requireNonNull(getActivity()).getIntent().getExtras();
+//        if (bundle != null) {
+//            if (bundle.getBoolean("new")) {
+//                getActivity().setTitle(getString(R.string.new_group));
+//                ept.clear();
+//            } else {
+//                int id = bundle.getInt("group");
+//                String name = bundle.getString("name");
+//                ept.clear();
+//                ept = databaseAdapter.getAllEptById(id);
+//                getActivity().setTitle(getString(R.string.group, name));
+//                eptAdapter = new EptAdapter(getActivity(), ept);
+//                eptList.setAdapter(eptAdapter);
+//            }
+//        } else {
+//
+//        }
 
 
         binding.addEpt.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+
+                Bundle bundle = new Bundle();
+                bundle.putInt("group_position", position);
                 NavHostFragment.findNavController(GroupDataFragment.this)
                         .navigate(R.id.action_GroupDataFragment_to_GroupEptFragment);
             }

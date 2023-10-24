@@ -106,9 +106,6 @@ public class DataActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_data);
 
-        File file = new File(this.getFilesDir(), "groups.grf");
-        FileHandler fileHandler = new FileHandler(file);
-
         send = findViewById(R.id.send);
         receive = findViewById(R.id.receive);
         add = findViewById(R.id.add);
@@ -153,24 +150,7 @@ public class DataActivity extends AppCompatActivity {
         save.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                try {
-                // Записываем все байты в файл
-                    byte[] allBytes = new byte[51200];
-                    fileHandler.writeBytes(allBytes);
 
-                // Записываем данные в указанную позицию файла с шагом 512 байт
-                    byte[] data = "Hello World!".getBytes();
-                    fileHandler.writeBytesToPosition(data, 512);
-
-                // Читаем данные с указанной позиции файла с заданной длиной и шагом 512 байт
-                    byte[] readData = fileHandler.readBytesFromPosition(12, 512);
-                    System.out.println(new String(readData));
-                } catch (IOException e) {
-                    e.printStackTrace();
-                } finally {
-                // Закрываем файл
-                    fileHandler.close();
-                }
             }
         });
 

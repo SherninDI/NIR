@@ -30,7 +30,8 @@
                     android:layout_height="wrap_content"
                     android:inputType="text"
                     android:ems="10"
-                    android:textSize="20sp"
+                    android:layout_marginBottom="10dp"
+                    android:textSize="18sp"
                     android:id="@+id/text_name"
                     android:maxLength="15"
                     android:hint="@string/name_hint"/>
@@ -40,7 +41,8 @@
                     android:layout_height="wrap_content"
                     android:inputType="number"
                     android:ems="10"
-                    android:textSize="20sp"
+                    android:layout_marginBottom="10dp"
+                    android:textSize="18sp"
                     android:id="@+id/text_time"
                     android:maxLength="5"
                     android:hint="@string/time_hint"/>
@@ -48,13 +50,16 @@
             <TextView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:layout_marginBottom="10dp"
                     android:textSize="20sp"
+                    android:textColor="@color/black"
                     android:id="@+id/text_mode"
                     android:text ="@string/mode_text"/>
 
             <RadioGroup
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:layout_marginBottom="10dp"
                     android:id="@+id/mode">
                 <RadioButton
                         android:id="@+id/mode_serial"
@@ -84,13 +89,16 @@
             <TextView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:layout_marginBottom="10dp"
                     android:textSize="20sp"
+                    android:textColor="@color/black"
                     android:id="@+id/text_spectre"
                     android:text ="@string/spectre_text"/>
 
             <RadioGroup
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:layout_marginBottom="10dp"
                     android:id="@+id/spectre">
                 <RadioButton
                         android:id="@+id/spectre_enable1"
@@ -120,13 +128,16 @@
             <TextView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:layout_marginBottom="10dp"
                     android:textSize="20sp"
+                    android:textColor="@color/black"
                     android:id="@+id/text_freq"
                     android:text ="@string/freq_text"/>
 
             <RadioGroup
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:layout_marginBottom="10dp"
                     android:id="@+id/freq">
                 <RadioButton
                         android:id="@+id/freq_1100"

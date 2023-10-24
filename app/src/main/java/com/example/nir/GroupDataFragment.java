@@ -88,5 +88,4 @@ public class GroupDataFragment extends Fragment {
         super.onDestroyView();
         binding = null;
     }
-
 }

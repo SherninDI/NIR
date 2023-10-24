@@ -12,7 +12,10 @@ import androidx.navigation.ui.AppBarConfiguration;
 import androidx.navigation.ui.NavigationUI;
 import com.example.nir.databinding.ActivityGroupDataBinding;
 
-public class GroupDataActivity extends AppCompatActivity {
+public class GroupDataActivity extends AppCompatActivity implements GroupSettingsFragment.onCancelListener {
+
+
+
     private final String TAG =  GroupDataActivity.class.getSimpleName();
     private AppBarConfiguration appBarConfiguration;
     private ActivityGroupDataBinding binding;
@@ -35,6 +38,7 @@ public class GroupDataActivity extends AppCompatActivity {
 
         setSupportActionBar(binding.toolbar);
         NavController navController = Navigation.findNavController(this, R.id.nav_host_fragment_content_group_data);
+        Log.e(TAG, String.valueOf(R.id.nav));
         Bundle bundle = getIntent().getExtras();
 //        if (bundle != null) {
 //            if (bundle.getBoolean("new")) {
@@ -56,10 +60,17 @@ public class GroupDataActivity extends AppCompatActivity {
 
     }
 
+
+
     @Override
     public boolean onSupportNavigateUp() {
         NavController navController = Navigation.findNavController(this, R.id.nav_host_fragment_content_group_data);
         return NavigationUI.navigateUp(navController, appBarConfiguration)
                 || super.onSupportNavigateUp();
+    }
+
+    @Override
+    public void cancel() {
+        super.onBackPressed();
     }
 }

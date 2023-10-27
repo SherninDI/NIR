@@ -77,8 +77,8 @@ public class DatabaseAdapter {
         return groups;
     }
 
-    public List<String> getAllEptById(int id) {
-        List<String> subgroups = new ArrayList<>();
+    public ArrayList<ItemEpt> getAllEptById(int id) {
+        ArrayList<ItemEpt> ept = new ArrayList<>();
         String sql = "SELECT * FROM sub_groups WHERE group_id=" + (id + 1) + ";";
         Cursor cursor = getData(sql);
         while (cursor.moveToNext()) {
@@ -91,25 +91,41 @@ public class DatabaseAdapter {
                 int value_id = cursor1.getInt(0);
                 int sub_group_id = cursor1.getInt(1);
                 int value = cursor1.getInt(2);
-                subgroups.add(name);
+                ItemEpt itemEpt = new ItemEpt(name, value);
+                ept.add(itemEpt);
             }
             cursor1.close();
         }
         cursor.close();
-        return subgroups;
+        return ept;
     }
 
-    public List<String> getAllEpt() {
-        List<String> subgroups = new ArrayList<>();
+    public ArrayList<ItemEpt> getAllEpt() {
+        ArrayList<ItemEpt> ept = new ArrayList<>();
         String sql = "SELECT * FROM sub_groups;";
         Cursor cursor = getData(sql);
         while (cursor.moveToNext()) {
             int subgroup_id = cursor.getInt(0);
-            int group_id = cursor.getInt(1);
             String name = cursor.getString(2);
-            subgroups.add(name);
+            String sql1 = "SELECT * FROM vals WHERE sub_group_id="+subgroup_id+";";
+            Cursor cursor1 = getData(sql1);
+            while (cursor1.moveToNext()) {
+                int value = cursor1.getInt(2);
+                ItemEpt itemEpt = new ItemEpt(name, value);
+                ept.add(itemEpt);
+            }
+            cursor1.close();
         }
         cursor.close();
-        return subgroups;
+
+//        Cursor cursor = getData(sql);
+//        while (cursor.moveToNext()) {
+//            int subgroup_id = cursor.getInt(0);
+//            int group_id = cursor.getInt(1);
+//            String name = cursor.getString(2);
+//            subgroups.add(name);
+//        }
+//        cursor.close();
+        return ept;
     }
 }

@@ -17,7 +17,7 @@ import java.util.List;
 
 
 public class GroupEptFragment extends Fragment {
-
+    private final String TAG = GroupEptFragment.class.getSimpleName();
     private List<String> groups = new ArrayList<>();
 
     private DatabaseAdapter databaseAdapter;
@@ -40,25 +40,7 @@ public class GroupEptFragment extends Fragment {
 
     public void onViewCreated(@NonNull View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        codeList = getView().findViewById(R.id.code_list);
-        Spinner groupSpinner = getView().findViewById(R.id.spinner_group);
 
-        databaseAdapter = new DatabaseAdapter(getActivity());
-        databaseAdapter.createDataBase();
-        databaseAdapter.openDataBase();
-
-        groups = databaseAdapter.getAllGroups();
-
-        ArrayAdapter<String> spinnerGroupAdapter = new ArrayAdapter<String>(getActivity(),android.R.layout.simple_spinner_item,groups);
-        spinnerGroupAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        groupSpinner.setAdapter(spinnerGroupAdapter);
-        groupSpinner.setSelection(-1);
-
-
-
-        ept = databaseAdapter.getAllEpt();
-        codeAdapter = new EptAdapter(getActivity(), ept);
-        codeList.setAdapter(codeAdapter);
 
 
 //        binding.buttonSecond.setOnClickListener(new View.OnClickListener() {
@@ -68,12 +50,19 @@ public class GroupEptFragment extends Fragment {
 //                        .navigate(R.id.action_GroupEptFragment_to_GroupDataFragment);
 //            }
 //        });
+
+        binding.codes.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                NavHostFragment.findNavController(GroupEptFragment.this)
+                        .navigate(R.id.action_GroupEptFragment_to_CodesFragment);
+            }
+        });
     }
 
     @Override
     public void onDestroyView() {
         super.onDestroyView();
-        databaseAdapter.close();
         binding = null;
     }
 }

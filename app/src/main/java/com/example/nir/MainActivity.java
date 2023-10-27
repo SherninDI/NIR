@@ -43,23 +43,25 @@ public class MainActivity extends AppCompatActivity {
 
         File file = new File(this.getFilesDir(), "groups.grf");
         FileHandler fileHandler = new FileHandler(file);
-//        byte[] allBytes = new byte[51200];
-//        try {
-//            fileHandler.writeBytes(allBytes);
-//        } catch (IOException e) {
-//            e.printStackTrace();
-//        } finally {
-//            fileHandler.close();
-//        }
+        byte[] allBytes = new byte[51200];
+        try {
+            fileHandler.writeBytes(allBytes);
+        } catch (IOException e) {
+            e.printStackTrace();
+        } finally {
+            fileHandler.close();
+        }
 
         usbDevice = getDevice();
         connect.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (usbDevice != null) {
-                    Intent intent = new Intent(getApplicationContext(), DataActivity.class);
-                    startActivity(intent);
-                }
+//                if (usbDevice != null) {
+//                    Intent intent = new Intent(getApplicationContext(), DataActivity.class);
+//                    startActivity(intent);
+//                }
+                Intent intent = new Intent(getApplicationContext(), DataActivity.class);
+                startActivity(intent);
             }
         });
 

@@ -1,5 +1,7 @@
 package com.example.nir;
 
+import android.app.Activity;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -42,7 +44,7 @@ public class GroupDataFragment extends Fragment {
     public void onViewCreated(@NonNull View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        eptList = getView().findViewById(R.id.ept_list);
+        eptList = view.findViewById(R.id.ept_list);
 
         databaseAdapter = new DatabaseAdapter(getActivity());
         databaseAdapter.createDataBase();
@@ -51,6 +53,8 @@ public class GroupDataFragment extends Fragment {
         Bundle bundle = getArguments();
         if (bundle != null) {
             position = bundle.getInt("group_position");
+            String name = bundle.getString("group_name");
+            getActivity().setTitle(getString(R.string.group, name));
         }
         Log.e(TAG, String.valueOf(position));
 
@@ -82,15 +86,32 @@ public class GroupDataFragment extends Fragment {
                 Bundle bundle = new Bundle();
                 bundle.putInt("group_position", position);
                 NavHostFragment.findNavController(GroupDataFragment.this)
-                        .navigate(R.id.action_GroupDataFragment_to_GroupEptFragment);
+                        .navigate(R.id.action_GroupDataFragment_to_GroupEptFragment, bundle);
             }
         });
 
         binding.settings.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                Bundle bundle = new Bundle();
+                bundle.putInt("group_position", position);
                 NavHostFragment.findNavController(GroupDataFragment.this)
-                        .navigate(R.id.action_GroupDataFragment_to_GroupSettingsFragment);
+                        .navigate(R.id.action_GroupDataFragment_to_GroupSettingsFragment, bundle);
+            }
+        });
+
+        binding.delete.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+            }
+        });
+        binding.saveChanges.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(getActivity(), DataActivity.class);
+                startActivity(intent);
+
             }
         });
 

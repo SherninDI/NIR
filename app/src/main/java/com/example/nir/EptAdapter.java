@@ -1,6 +1,7 @@
 package com.example.nir;
 
 import android.content.Context;
+import android.graphics.Color;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -11,14 +12,15 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class EptAdapter extends RecyclerView.Adapter<EptAdapter.ViewHolder>{
-    private final List<String> subGroups;
+    private final ArrayList<ItemEpt> ept;
+    int selected_position = -1;
     private final LayoutInflater mInflater;
     private static EptClickListener eptClickListener;
 
     // data is passed into the constructor
-    EptAdapter(Context context, List<String> subGroups) {
+    EptAdapter(Context context, ArrayList<ItemEpt> ept) {
         this.mInflater = LayoutInflater.from(context);
-        this.subGroups = subGroups;
+        this.ept = ept;
     }
 
     // inflates the row layout from xml when needed
@@ -31,37 +33,41 @@ public class EptAdapter extends RecyclerView.Adapter<EptAdapter.ViewHolder>{
     // binds the data to the TextView in each row
     @Override
     public void onBindViewHolder(final ViewHolder holder, final int position) {
-        final String itemList = subGroups.get(position);
-        holder.tvSubGroupName.setText(itemList);
-//        holder.tvSubGroupValue.setText(itemList.getSubGroupValue());
+        final ItemEpt itemList = ept.get(position);
+        holder.tvSubGroupName.setText(itemList.getEptNameText());
+        holder.tvSubGroupValue.setText(itemList.getEptValueText());
+        holder.itemView.setBackgroundColor(selected_position == position ? Color.RED : Color.TRANSPARENT);
     }
 
     // total number of rows
     @Override
     public int getItemCount() {
-        return subGroups.size();
+        return ept.size();
     }
 
 
     // stores and recycles views as they are scrolled off screen
     public class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener{
         public TextView tvSubGroupName;
-//        public TextView tvSubGroupValue;
+        public TextView tvSubGroupValue;
         public ViewHolder(View itemView) {
             super(itemView);
             tvSubGroupName = itemView.findViewById(R.id.tvEptName);
-//            tvSubGroupValue = itemView.findViewById(R.id.tvSubGroupValue);
-            itemView.setOnClickListener(this::onClick);
+            tvSubGroupValue = itemView.findViewById(R.id.tvEptValue);
+            itemView.setOnClickListener(this);
         }
 
         @Override
         public void onClick(View itemView) {
-
-            eptClickListener.onEptClick(getAdapterPosition(),itemView);
+            if (getAdapterPosition() == RecyclerView.NO_POSITION) return;
+            notifyItemChanged(selected_position);
+            selected_position = getAdapterPosition();
+            notifyItemChanged(selected_position);
+            eptClickListener.onEptClick(selected_position,itemView);
         }
     }
 
-    public void setOnSubGroupClickListener(EptAdapter.EptClickListener subgroupClickListener) {
+    public void setOnEptClickListener(EptAdapter.EptClickListener eptClickListener) {
         EptAdapter.eptClickListener = eptClickListener;
     }
 

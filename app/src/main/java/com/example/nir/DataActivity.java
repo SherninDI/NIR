@@ -37,6 +37,16 @@ public class DataActivity extends AppCompatActivity {
 
     private DatabaseAdapter databaseAdapter;
     private List<String> subgroups = new ArrayList<String>();
+
+
+    private File file;
+    private FileHandler fileHandler;
+
+    private byte[] groupsByte = new byte[51200];
+    private byte[] group = new byte[512];
+    private int groupSize = 512;
+
+
     private static final String ACTION_USB_PERMISSION = "com.android.example.USB_PERMISSION";
     private final ExecutorService mExecutor = Executors.newSingleThreadExecutor();
     private final BroadcastReceiver usbReceiver = new BroadcastReceiver() {
@@ -119,22 +129,47 @@ public class DataActivity extends AppCompatActivity {
         databaseAdapter.createDataBase();
         databaseAdapter.openDataBase();
 
-        groups = databaseAdapter.getAllGroups();
-        groupAdapter = new GroupAdapter(this, groups);
-        groupList.setAdapter(groupAdapter);
-
-        groupAdapter.setOnGroupClickListener(new GroupAdapter.GroupClickListener() {
-            @Override
-            public void onGroupClick(int position, View itemView) {
-                TextView textView = (TextView) itemView.findViewById(R.id.tvGroupName) ;
-//                Log.e(TAG, textView.getText().toString());
-                Intent intent = new Intent(DataActivity.this, GroupDataActivity.class);
-                intent.putExtra("group", position);
-                intent.putExtra("new", false);
-                intent.putExtra("name", textView.getText().toString());
-                startActivity(intent);
+        file = new File(this.getFilesDir(), "groups.grf");
+        fileHandler = new FileHandler(file);
+        try {
+            groupsByte = fileHandler.readBytes(51200);
+            for (int i = 0; i < groupsByte.length / groupSize; i++) {
+                group = fileHandler.readBytesFromPosition(groupSize, groupSize * i);
+                GroupFormat groupFormat = new GroupFormat(group);
+                if (groupFormat.readTitleLength() != 0) {
+                    groups.add(groupFormat.readTitle());
+                }
+//                Log.i(TAG, i + " " + bytesToHex(group));
             }
-        });
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        Log.e(TAG, String.valueOf(groupsByte.length));
+
+
+
+
+
+//        groups = databaseAdapter.getAllGroups();
+
+        if (groups.size() != 0) {
+            groupAdapter = new GroupAdapter(this, groups);
+            groupList.setAdapter(groupAdapter);
+            groupAdapter.notifyDataSetChanged();
+            groupAdapter.setOnGroupClickListener(new GroupAdapter.GroupClickListener() {
+                @Override
+                public void onGroupClick(int position, View itemView) {
+                    TextView textView = (TextView) itemView.findViewById(R.id.tvGroupName) ;
+//                Log.e(TAG, textView.getText().toString());
+                    Intent intent = new Intent(DataActivity.this, GroupDataActivity.class);
+                    intent.putExtra("group", position);
+                    intent.putExtra("new", false);
+                    intent.putExtra("name", textView.getText().toString());
+                    startActivity(intent);
+                }
+            });
+        }
+
 
         add.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -166,46 +201,46 @@ public class DataActivity extends AppCompatActivity {
 //            }
 //        });
 
-        usbManager = (UsbManager) getSystemService(Context.USB_SERVICE);
-        UsbDevice usbDevice = findDevice();
-        PendingIntent mPermissionIntent = PendingIntent.getBroadcast(this, 0, new Intent(ACTION_USB_PERMISSION), 0);
-        IntentFilter filter = new IntentFilter(ACTION_USB_PERMISSION);
-        registerReceiver(usbReceiver, filter);
-        if (usbDevice != null) {
-            this.usbDevice = usbDevice;
-            registerReceiver(usbReceiver, filter);
-            usbManager.requestPermission(this.usbDevice, mPermissionIntent);
-            for (int intf = 0; intf < this.usbDevice.getInterfaceCount(); intf++) {
-                usbInterface = this.usbDevice.getInterface(intf);
-                if (usbInterface.getInterfaceClass() == UsbConstants.USB_CLASS_CDC_DATA) {
-                    for (int nEp = 0; nEp < usbInterface.getEndpointCount(); nEp++) {
-                        UsbEndpoint tmpEndpoint = usbInterface.getEndpoint(nEp);
-                        if (tmpEndpoint.getType() != UsbConstants.USB_ENDPOINT_XFER_BULK) continue;
-
-                        if ((outEndpoint == null)
-                                && (tmpEndpoint.getDirection() == UsbConstants.USB_DIR_OUT)) {
-                            outEndpoint = tmpEndpoint;
-                            System.out.println("endpO" + outEndpoint.getMaxPacketSize());
-                        } else if ((inEndpoint == null)
-                                && (tmpEndpoint.getDirection() == UsbConstants.USB_DIR_IN)) {
-                            inEndpoint = tmpEndpoint;
-                            System.out.println("endpI" + inEndpoint.getMaxPacketSize());
-                        }
-                    }
-                    if (outEndpoint == null) {
-                        Toast.makeText(this, "no endpoints", Toast.LENGTH_LONG).show();
-                    }
-                    usbConnection = usbManager.openDevice(this.usbDevice);
-                    if (usbConnection == null) {
-                        Toast.makeText(this, "can't open device", Toast.LENGTH_SHORT).show();
-                        return;
-                    } else {
-                        usbConnection.claimInterface(usbInterface, true);
-                        startIoManager();
-                    }
-                }
-            }
-        }
+//        usbManager = (UsbManager) getSystemService(Context.USB_SERVICE);
+//        UsbDevice usbDevice = findDevice();
+//        PendingIntent mPermissionIntent = PendingIntent.getBroadcast(this, 0, new Intent(ACTION_USB_PERMISSION), 0);
+//        IntentFilter filter = new IntentFilter(ACTION_USB_PERMISSION);
+//        registerReceiver(usbReceiver, filter);
+//        if (usbDevice != null) {
+//            this.usbDevice = usbDevice;
+//            registerReceiver(usbReceiver, filter);
+//            usbManager.requestPermission(this.usbDevice, mPermissionIntent);
+//            for (int intf = 0; intf < this.usbDevice.getInterfaceCount(); intf++) {
+//                usbInterface = this.usbDevice.getInterface(intf);
+//                if (usbInterface.getInterfaceClass() == UsbConstants.USB_CLASS_CDC_DATA) {
+//                    for (int nEp = 0; nEp < usbInterface.getEndpointCount(); nEp++) {
+//                        UsbEndpoint tmpEndpoint = usbInterface.getEndpoint(nEp);
+//                        if (tmpEndpoint.getType() != UsbConstants.USB_ENDPOINT_XFER_BULK) continue;
+//
+//                        if ((outEndpoint == null)
+//                                && (tmpEndpoint.getDirection() == UsbConstants.USB_DIR_OUT)) {
+//                            outEndpoint = tmpEndpoint;
+//                            System.out.println("endpO" + outEndpoint.getMaxPacketSize());
+//                        } else if ((inEndpoint == null)
+//                                && (tmpEndpoint.getDirection() == UsbConstants.USB_DIR_IN)) {
+//                            inEndpoint = tmpEndpoint;
+//                            System.out.println("endpI" + inEndpoint.getMaxPacketSize());
+//                        }
+//                    }
+//                    if (outEndpoint == null) {
+//                        Toast.makeText(this, "no endpoints", Toast.LENGTH_LONG).show();
+//                    }
+//                    usbConnection = usbManager.openDevice(this.usbDevice);
+//                    if (usbConnection == null) {
+//                        Toast.makeText(this, "can't open device", Toast.LENGTH_SHORT).show();
+//                        return;
+//                    } else {
+//                        usbConnection.claimInterface(usbInterface, true);
+//                        startIoManager();
+//                    }
+//                }
+//            }
+//        }
 
     }
 
@@ -230,12 +265,12 @@ public class DataActivity extends AppCompatActivity {
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        if (usbManager != null) {
-            stopIoManager();
-            usbConnection.close();
-            timer.cancel();
-            unregisterReceiver(usbReceiver);
-        }
+//        if (usbManager != null) {
+//            stopIoManager();
+//            usbConnection.close();
+//            timer.cancel();
+//            unregisterReceiver(usbReceiver);
+//        }
         databaseAdapter.close();
     }
 
@@ -265,14 +300,14 @@ public class DataActivity extends AppCompatActivity {
 //
 //    }
 
-//    public static String bytesToHex(byte[] byteArray)
-//    {
-//        String hex = "";
-//        // Iterating through each byte in the array
-//        for (byte i : byteArray) {
-//            hex += String.format("%02X", i);
-//            hex += " ";
-//        }
-//        return hex;
-//    }
+    public static String bytesToHex(byte[] byteArray)
+    {
+        String hex = "";
+        // Iterating through each byte in the array
+        for (byte i : byteArray) {
+            hex += String.format("%02X", i);
+            hex += " ";
+        }
+        return hex;
+    }
 }

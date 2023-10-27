@@ -46,7 +46,7 @@
     <string name="freq_15000">15000 Гц</string>
 
     <string name="ampl_hint">Введите амплитуду</string>
-    <string name="step_time_hint">Введите время шага</string>
+    <string name="step_time_hint">Введите время шага 0–65535</string>
     <string name="code_hint">Введите код или выберите из справочника</string>
     <string name="type_text">Тип записи</string>
     <string name="codes">Справочник</string>
@@ -58,4 +58,6 @@
     <string name="hello_first_fragment">Hello first fragment</string>
     <string name="hello_second_fragment">Hello second fragment. Arg: %1$s</string>
     <string name="title_activity_group_data">GroupDataActivity</string>
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
 </resources>

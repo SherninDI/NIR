@@ -13,4 +13,8 @@
     </style>
     <style name="Theme.Nir.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar"/>
     <style name="Theme.Nir.PopupOverlay" parent="ThemeOverlay.AppCompat.Light"/>
+
+    <style name="spinnerItemStyle" parent="android:Widget.TextView.SpinnerItem"/>
+
+    <style name="spinnerDropDownItemStyle" parent="android:TextAppearance.Widget.TextView.SpinnerItem"/>
 </resources>

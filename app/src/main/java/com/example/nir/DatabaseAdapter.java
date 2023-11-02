@@ -117,15 +117,26 @@ public class DatabaseAdapter {
             cursor1.close();
         }
         cursor.close();
+        return ept;
+    }
 
-//        Cursor cursor = getData(sql);
-//        while (cursor.moveToNext()) {
-//            int subgroup_id = cursor.getInt(0);
-//            int group_id = cursor.getInt(1);
-//            String name = cursor.getString(2);
-//            subgroups.add(name);
-//        }
-//        cursor.close();
+    public ItemEpt getEptByValue(int code) {
+        ItemEpt ept = null;
+        String sqlEPT = "SELECT * FROM vals WHERE value=" + code + ";";
+        Cursor cursorEPT = getData(sqlEPT);
+        while (cursorEPT.moveToNext()) {
+            int value_id = cursorEPT.getInt(0);
+            int sub_group_id = cursorEPT.getInt(1);
+            int value = cursorEPT.getInt(2);
+            String sqlName = "SELECT * FROM sub_groups WHERE id=" + sub_group_id + ";";
+            Cursor cursorName = getData(sqlName);
+            while (cursorName.moveToNext()) {
+                int sub_id = cursorName.getInt(0);
+                int group_id = cursorName.getInt(1);
+                String name = cursorName.getString(2);
+                ept = new ItemEpt(name, value);
+            }
+        }
         return ept;
     }
 }

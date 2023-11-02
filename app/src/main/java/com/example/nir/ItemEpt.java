@@ -17,17 +17,10 @@ public class ItemEpt {
         return eptValueText;
     }
 
-    public void setEptNameText(String eptNameText) {
-        this.eptNameText = eptNameText;
+    public String getEpt() {
+        return eptValueText + " " + eptNameText;
     }
 
-    public void setEptValue(int eptValue) {
-        this.eptValue = eptValue;
-    }
-
-    public void setEptValueText(String eptValueText) {
-        this.eptValueText = eptValueText;
-    }
 
     public ItemEpt(String name, int value){
         this.eptNameText = name;

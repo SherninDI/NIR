@@ -9,19 +9,32 @@
         android:focusableInTouchMode="true"
         tools:context=".GroupEptFragment">
 
+    <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:ems="10"
+            android:gravity="top"
+            android:textSize="20sp"
+            android:layout_marginTop="25dp"
+            android:id="@+id/text_code"
+            android:hint="@string/code_hint"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent"/>
+
 
     <EditText
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:inputType="number"
-            android:textSize="18sp"
-            android:layout_marginBottom="10dp"
+            android:textSize="20sp"
+            android:layout_marginTop="25dp"
             android:gravity="top"
             android:id="@+id/text_ampl"
             android:hint="@string/ampl_hint"
-            app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"/>
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/text_code"/>
 
     <EditText
             android:layout_width="match_parent"
@@ -29,27 +42,15 @@
             android:inputType="number"
             android:ems="10"
             android:gravity="top"
-            android:textSize="18sp"
-            android:layout_marginBottom="10dp"
+            android:textSize="20sp"
+            android:layout_marginTop="25dp"
             android:id="@+id/text_step_time"
             android:hint="@string/step_time_hint"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/text_ampl"/>
 
-    <EditText
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:inputType="number"
-            android:ems="10"
-            android:gravity="top"
-            android:textSize="18sp"
-            android:layout_marginBottom="10dp"
-            android:id="@+id/text_code"
-            android:hint="@string/code_hint"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/text_step_time"/>
+
 
     <LinearLayout
             android:layout_width="match_parent"
@@ -57,15 +58,14 @@
             android:id="@+id/type_linear"
             android:gravity="top"
             android:orientation="horizontal"
-            android:layout_marginBottom="10dp"
+            android:layout_marginTop="25dp"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/text_code">
+            app:layout_constraintTop_toBottomOf="@+id/text_step_time">
 
         <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-
                 android:textSize="20sp"
                 android:id="@+id/text_type"
                 android:text="@string/type_text"/>
@@ -102,7 +102,7 @@
         <Button
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
-                android:id="@+id/cancel_settings"
+                android:id="@+id/cancel_code_settings"
                 android:text="@string/cancel_button"
                 android:layout_column="0"
                 android:layout_marginEnd="5dp"
@@ -112,7 +112,7 @@
         <Button
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
-                android:id="@+id/save_settings"
+                android:id="@+id/save_code_settings"
                 android:text="@string/save_button"
                 android:layout_column="1"
                 android:layout_marginStart="5dp"

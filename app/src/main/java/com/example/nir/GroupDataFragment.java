@@ -11,10 +11,14 @@ import android.view.ViewGroup;
 
 import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
+import android.widget.TextView;
 import androidx.navigation.fragment.NavHostFragment;
 import com.example.nir.databinding.FragmentGroupDataBinding;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 
@@ -22,28 +26,31 @@ public class GroupDataFragment extends Fragment {
     private final String TAG = GroupDataFragment.class.getSimpleName();
     private FragmentGroupDataBinding binding;
     private DatabaseAdapter databaseAdapter;
-    private List<String> ept = new ArrayList<>();
+    private ArrayList<ItemEpt> ept = new ArrayList<>();
 
     private RecyclerView eptList;
     private EptAdapter eptAdapter;
 
     private int position;
-    private int ept_position;
+
+    private File file;
+    private FileHandler fileHandler;
+
+    private byte[] groupsByte = new byte[51200];
+    private byte[] group = new byte[512];
+    private int groupSize = 512;
 
     @Override
     public View onCreateView(
             LayoutInflater inflater, ViewGroup container,
             Bundle savedInstanceState
     ) {
-
         binding = FragmentGroupDataBinding.inflate(inflater, container, false);
         return binding.getRoot();
-
     }
 
     public void onViewCreated(@NonNull View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-
         eptList = view.findViewById(R.id.ept_list);
 
         databaseAdapter = new DatabaseAdapter(getActivity());
@@ -56,33 +63,40 @@ public class GroupDataFragment extends Fragment {
             String name = bundle.getString("group_name");
             getActivity().setTitle(getString(R.string.group, name));
         }
-        Log.e(TAG, String.valueOf(position));
 
+        file = new File(getActivity().getFilesDir(), "groups.grf");
+        fileHandler = new FileHandler(file);
+        try {
+            group = fileHandler.readBytesFromPosition(position);
+            Log.i(TAG,position + " " + bytesToHex(group));
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
 
+        GroupFormat groupFormat = new GroupFormat(group);
+        for (int i = 0; i < 480 / 6; i++) {
+            int stepValue = groupFormat.readValue(i);
+            if (stepValue != 0) {
+                ept.add(databaseAdapter.getEptByValue(stepValue));
+            }
+        }
 
-//        Bundle bundle = Objects.requireNonNull(getActivity()).getIntent().getExtras();
-//        if (bundle != null) {
-//            if (bundle.getBoolean("new")) {
-//                getActivity().setTitle(getString(R.string.new_group));
-//                ept.clear();
-//            } else {
-//                int id = bundle.getInt("group");
-//                String name = bundle.getString("name");
-//                ept.clear();
-//                ept = databaseAdapter.getAllEptById(id);
-//                getActivity().setTitle(getString(R.string.group, name));
-//                eptAdapter = new EptAdapter(getActivity(), ept);
-//                eptList.setAdapter(eptAdapter);
-//            }
-//        } else {
-//
-//        }
+        if (ept.size() != 0) {
+            eptAdapter = new EptAdapter(getActivity(), ept);
+            eptList.setAdapter(eptAdapter);
+            eptAdapter.setOnEptClickListener(new EptAdapter.EptClickListener() {
+                @Override
+                public void onEptClick(int position, View itemView) {
 
+                    int ampl = groupFormat.readAmpl(position);
+                    int stepTime = groupFormat.readStepTime(position);
+                }
+            });
+        }
 
         binding.addEpt.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
                 Bundle bundle = new Bundle();
                 bundle.putInt("group_position", position);
                 NavHostFragment.findNavController(GroupDataFragment.this)
@@ -103,24 +117,48 @@ public class GroupDataFragment extends Fragment {
         binding.delete.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                try {
+                    fileHandler.deleteBytesFromPosition(position);
+                    Intent intent = new Intent(getActivity(), DataActivity.class);
+                    startActivity(intent);
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
 
             }
         });
         binding.saveChanges.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(getActivity(), DataActivity.class);
-                startActivity(intent);
-
+                GroupFormat groupFormat = new GroupFormat(group);
+                groupFormat.writeCRC();
+                try {
+                    fileHandler.writeBytesToPosition(group, position);
+                    Intent intent = new Intent(getActivity(), DataActivity.class);
+                    startActivity(intent);
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
             }
         });
-
-
     }
 
+    public String bytesToHex(byte[] byteArray)
+    {
+        String hex = "";
+
+        // Iterating through each byte in the array
+        for (byte i : byteArray) {
+            hex += String.format("%02X", i);
+            hex += " ";
+        }
+
+        return hex;
+    }
     @Override
     public void onDestroyView() {
         super.onDestroyView();
+        fileHandler.close();
         binding = null;
     }
 }

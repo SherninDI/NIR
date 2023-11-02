@@ -9,10 +9,10 @@ import android.widget.TextView;
 import java.util.List;
 
 public class SpinnerAdapter extends ArrayAdapter<String> {
-    private Context context;
-    private int textViewResourceId;
-    private List<String> objects;
-    public static boolean flag = false;
+    private final Context context;
+    private final int textViewResourceId;
+    private final List<String> objects;
+//    public static boolean flag = false;
     public SpinnerAdapter(Context context, int textViewResourceId,
                           List<String> objects) {
         super(context, textViewResourceId, objects);
@@ -24,10 +24,13 @@ public class SpinnerAdapter extends ArrayAdapter<String> {
     public View getView(int position, View convertView, ViewGroup parent) {
         if (convertView == null)
             convertView = View.inflate(context, textViewResourceId, null);
-        if (flag) {
-            TextView tv = (TextView) convertView;
-            tv.setText(objects.get(position));
-        }
+
+        TextView tv = (TextView) convertView;
+        tv.setText(objects.get(position));
+
+//        if (flag) {
+//
+//        }
         return convertView;
     }
 }

@@ -1,11 +1,15 @@
 package com.example.nir;
 
+import android.util.Log;
+
 import java.math.BigInteger;
+import java.nio.ByteBuffer;
 import java.nio.charset.Charset;
+import java.util.Arrays;
 
 public class GroupFormat {
     private byte[] byteArray;
-    private CheckSum checkSum;
+    private CheckSum checkSum = new CheckSum();
 
     public GroupFormat(byte[] group) {
         byteArray = group;
@@ -100,6 +104,68 @@ public class GroupFormat {
         return readByte(26);
     }
 
+    public void writeStep(String type, int code, int ampl, int stepTime, int stepPos) {
+        byte[] typeBytes = type.getBytes(Charset.forName("windows-1251"));
+        writeBytes(typeBytes, 27 + stepPos * 6);
+        byte[] codeBytes = reverseByteArray(BigInteger.valueOf(code).toByteArray());
+        writeBytes(codeBytes, 27 + stepPos * 6 + 1);
+        byte[] amplBytes = BigInteger.valueOf(ampl).toByteArray();
+        writeBytes(amplBytes, 27 + stepPos * 6 + 3);
+        byte[] stepTimeBytes = reverseByteArray(BigInteger.valueOf(stepTime).toByteArray());
+        writeBytes(stepTimeBytes, 27 + stepPos * 6 + 5);
+    }
+
+    public void writeAmpl(int ampl, int stepPos) {
+        byte[] amplBytes = BigInteger.valueOf(ampl).toByteArray();
+        writeBytes(amplBytes, 27 + stepPos * 6 + 3);
+
+    }
+    public int readAmpl(int stepPos) {
+        byte[] amplBytes = readBytes(1,27 + stepPos * 6 + 3);
+        return new BigInteger(amplBytes).intValue();
+    }
+
+    public void writeStepTime(int stepTime, int stepPos) {
+        byte[] stepTimeBytes = reverseByteArray(BigInteger.valueOf(stepTime).toByteArray());
+        writeBytes(stepTimeBytes, 27 + stepPos * 6 + 5);
+    }
+
+    public int readStepTime(int stepPos) {
+        byte[] stepTimeBytes = readBytes(2,27 + stepPos * 6 + 5);
+        return new BigInteger(stepTimeBytes).intValue();
+    }
+
+    public byte[] readStep(int stepPos) {
+        return readBytes(6,27 + stepPos * 6);
+    }
+
+    public int readValue(int stepPos) {
+        byte[] codeBytes = reverseByteArray(readBytes(2, 27 + stepPos * 6 + 1));
+        return new BigInteger(codeBytes).intValue();
+    }
+
+
+    public void deleteStep(int position) {
+        int stepLength = 6;
+        int stepsLength = 480;
+        byte[] step = new byte[stepLength];
+        int afterPos = (position + 1) * stepLength;
+        int beforePosStart = 0;
+        int beforePosEnd = position * stepLength;
+        if (position == 0) {
+            byte[] after = readBytes(stepsLength - stepLength, afterPos);
+            writeBytes(after, beforePosStart);
+            writeBytes(step, stepsLength - stepLength);
+
+        } else {
+            byte[] before = readBytes(beforePosEnd, beforePosStart);
+            byte[] after = readBytes(stepsLength - afterPos, afterPos);
+            writeBytes(before, beforePosStart);
+            writeBytes(after, beforePosEnd);
+            writeBytes(step, stepsLength - stepLength);
+        }
+    }
+
     public void writeSteps(byte[] steps) {
         writeBytes(steps,27);
     }
@@ -108,14 +174,12 @@ public class GroupFormat {
         return readBytes(480,27);
     }
 
-//    public void writeCRC(byte[] crc32Byte) {
-//        int crc32 = checkSum.CRC32sum(crc32Byte);
-//        writeBytes(reverseByteArray(BigInteger.valueOf(crc32).toByteArray()),507);
-//    }
+    public void writeCRC() {
+        byte[] crc32Byte = readBytes(503,4);
+        int crc32 = checkSum.CRC32sum(crc32Byte);
+        writeBytes(reverseByteArray(BigInteger.valueOf(crc32).toByteArray()),507);
+    }
 
-//    public int readCRC() {
-//        return readByte(26);
-//    }
 
     public void writeExec(int exec) {
         writeByte((byte) exec, 511);

@@ -84,7 +84,7 @@ public class GroupSettingsFragment extends Fragment {
         fileHandler = new FileHandler(file);
 
         try {
-            group = fileHandler.readBytesFromPosition(groupSize, groupSize * position);
+            group = fileHandler.readBytesFromPosition(position);
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -234,7 +234,7 @@ public class GroupSettingsFragment extends Fragment {
                 byte[] result = groupFormat.getBytes();
                 // save to file
                 try {
-                    fileHandler.writeBytesToPosition(result, groupSize * position);
+                    fileHandler.writeBytesToPosition(result, position);
                 } catch (IOException e) {
                     throw new RuntimeException(e);
                 } finally {
@@ -267,17 +267,6 @@ public class GroupSettingsFragment extends Fragment {
         binding = null;
     }
 
-    public String bytesToHex(byte[] byteArray)
-    {
-        String hex = "";
 
-        // Iterating through each byte in the array
-        for (byte i : byteArray) {
-            hex += String.format("%02X", i);
-            hex += " ";
-        }
-
-        return hex;
-    }
 
 }

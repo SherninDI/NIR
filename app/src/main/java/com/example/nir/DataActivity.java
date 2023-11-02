@@ -134,7 +134,7 @@ public class DataActivity extends AppCompatActivity {
         try {
             groupsByte = fileHandler.readBytes(51200);
             for (int i = 0; i < groupsByte.length / groupSize; i++) {
-                group = fileHandler.readBytesFromPosition(groupSize, groupSize * i);
+                group = fileHandler.readBytesFromPosition(i);
                 GroupFormat groupFormat = new GroupFormat(group);
                 if (groupFormat.readTitleLength() != 0) {
                     groups.add(groupFormat.readTitle());
@@ -144,7 +144,6 @@ public class DataActivity extends AppCompatActivity {
         } catch (IOException e) {
             e.printStackTrace();
         }
-        Log.e(TAG, String.valueOf(groupsByte.length));
 
 
 

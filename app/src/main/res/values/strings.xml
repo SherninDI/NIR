@@ -47,7 +47,7 @@
 
     <string name="ampl_hint">Введите амплитуду</string>
     <string name="step_time_hint">Введите время шага 0–65535</string>
-    <string name="code_hint">Введите код или выберите из справочника</string>
+    <string name="code_hint">Выберите код из справочника</string>
     <string name="type_text">Тип записи</string>
     <string name="codes">Справочник</string>
     <string name="search_text">Введите название или код</string>

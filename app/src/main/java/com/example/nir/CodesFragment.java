@@ -80,6 +80,7 @@ public class CodesFragment extends Fragment {
                 Bundle bundle = new Bundle();
                 bundle.putInt("code", code);
                 bundle.putString("codeName", codeName);
+                bundle.putBoolean("add", true);
                 NavHostFragment.findNavController(CodesFragment.this)
                         .navigate(R.id.action_CodesFragment_to_GroupEptFragment, bundle);
             }

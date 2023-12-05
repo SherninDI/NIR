@@ -6,6 +6,10 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.hardware.usb.*;
+import android.os.Handler;
+import android.os.Looper;
+import android.os.Message;
+import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
@@ -73,6 +77,8 @@ public class DataActivity extends AppCompatActivity {
     private UsbEndpoint outEndpoint;
     private UsbDeviceConnection usbConnection;
     private InputOutputManager inputOutputManager;
+
+    CommandFormat commandFormat;
     InputOutputManager.Listener listener = new InputOutputManager.Listener() {
         @Override
         public void onNewData(final byte[] data) {
@@ -106,8 +112,7 @@ public class DataActivity extends AppCompatActivity {
     TimerTask timerTask = new TimerTask() {
         @Override
         public void run() {
-//            commandsHandler.obtainMessage(SYS_NOP).sendToTarget();
-//            Log.d(TAG, "signal");
+            commandsHandler.obtainMessage(Constants.SYS_NOP).sendToTarget();
         }
     };
 
@@ -115,6 +120,7 @@ public class DataActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_data);
+        commandFormat = new CommandFormat();
 
         send = findViewById(R.id.send);
         receive = findViewById(R.id.receive);
@@ -145,11 +151,6 @@ public class DataActivity extends AppCompatActivity {
             e.printStackTrace();
         }
 
-
-
-
-
-//        groups = databaseAdapter.getAllGroups();
 
         if (groups.size() != 0) {
             groupAdapter = new GroupAdapter(this, groups);
@@ -184,7 +185,35 @@ public class DataActivity extends AppCompatActivity {
         save.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+            }
+        });
 
+        send.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                commandsHandler.obtainMessage(Constants.SYS_PUT, groupsByte.length,-1, groupsByte).sendToTarget();
+            }
+        });
+
+        receive.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                commandsHandler.obtainMessage(Constants.SYS_GET).sendToTarget();
+            }
+        });
+
+
+        reset.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                commandsHandler.obtainMessage(Constants.SYS_RESET).sendToTarget();
+            }
+        });
+
+        cancel.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                commandsHandler.obtainMessage(Constants.SYS_CANCEL).sendToTarget();
             }
         });
 
@@ -279,25 +308,71 @@ public class DataActivity extends AppCompatActivity {
 //        Log.d(TAG, message);
     }
 
-//    public void onClickButtonSend(View view) {
-//        byte[] data;
-//        data = new byte[]{0x0, 0x00, 0x00, 0x00, 0x00, 0x00, 0x01, 0x09, 0x00, 0x04};
-//        if (inputOutputManager == null) {
-//            Toast.makeText(this, "mInputOutputManager == null", Toast.LENGTH_LONG).show();
-//            return;
-//        }
-//        try {
-//            //data = textTransmitView.getText().toString().getBytes();
-//            inputOutputManager.writeAsync(data);
-//        } catch (Exception e) {
-//            Toast.makeText(this, e.getMessage(), Toast.LENGTH_LONG).show();
-//        }
-//    }
+    private void sendMessage(byte[] command) {
+        if (inputOutputManager == null) {
+            Toast.makeText(this, "mInputOutputManager == null", Toast.LENGTH_LONG).show();
+            return;
+        }
+        try {
+            //data = textTransmitView.getText().toString().getBytes();
+            inputOutputManager.writeAsync(command);
+        } catch (Exception e) {
+            Toast.makeText(this, e.getMessage(), Toast.LENGTH_LONG).show();
+        }
+    }
+
+    private final Handler commandsHandler = new Handler(Looper.getMainLooper(), new Handler.Callback() {
+        @Override
+        public boolean handleMessage(@NonNull Message message) {
+            byte[] command;
+            byte[] data = new byte[9];
+            switch (message.what) {
+                case Constants.SYS_NOP:
+                    command = commandFormat.getCommand(Constants.SYS_NOP, data);
+//                    sendMessage(command);
+                    Log.e(TAG, "SYS_NOP " + bytesToHex(command));
+                    break;
+                case Constants.SYS_RESET:
+                    command = commandFormat.getCommand(Constants.SYS_RESET, data);
+//                    sendMessage(command);
+                    Log.e(TAG, "SYS_RESET " + bytesToHex(command));
+                    break;
+                case Constants.SYS_PUT:
+                    byte[] buf = (byte[]) message.obj;
+                    command = commandFormat.getCommand(Constants.SYS_PUT, buf);
+//                    sendMessage(command);
+                    Log.e(TAG, "SYS_PUT " + bytesToHex(command));
+
+                    int blockSize = 8;
+                    int blockCount = buf.length / blockSize;
+                    for (int i = 0; i < blockCount; i++) {
+                        int idx = i * blockSize;
+                        byte[] range = Arrays.copyOfRange(buf, idx, idx + blockSize);
+//                        Log.e(TAG, "SYS_PUT " + bytesToHex(range) + " " + idx);
+                        commandsHandler.obtainMessage(Constants.SYS_DATA, idx,0, range).sendToTarget();
+                    }
+                    break;
+                case Constants.SYS_GET:
+                    command = commandFormat.getCommand(Constants.SYS_GET, data);
+//                    sendMessage(command);
+                    Log.e(TAG, "SYS_GET " + bytesToHex(command));
+                    break;
+                case Constants.SYS_CANCEL:
+                    command = commandFormat.getCommand(Constants.SYS_CANCEL, data);
+//                    inputOutputManager.writeAsync(command);
+                    Log.e(TAG, "SYS_CANCEL " + bytesToHex(command));
+                    break;
+                case Constants.SYS_DATA:
+                    command = commandFormat.getCommand(Constants.SYS_DATA, (byte[])message.obj);
+//                    sendMessage(command);
+                    Log.e(TAG, "SYS_DATA " + bytesToHex(command) + " " + message.arg1);
+                    break;
+            }
+            return false;
+        }
+    });
 
 
-//    public void onClickButtonConnect(View view) {
-//
-//    }
 
     public static String bytesToHex(byte[] byteArray)
     {

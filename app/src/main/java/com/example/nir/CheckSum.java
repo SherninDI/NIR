@@ -91,7 +91,7 @@ public class CheckSum {
                     0xB40BBE37, 0xC30C8EA1, 0x5A05DF1B, 0x2D02EF8D
             };
 
-    private byte CRC8sum(byte[] buffer, int len) {
+    public byte CRC8sum(byte[] buffer, int len) {
         byte crc = 0;
         for (int i = 0; i < len; i++) {
             crc = CRC8Table[(crc ^ buffer[i]) & 0xFF];

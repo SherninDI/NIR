@@ -4,6 +4,7 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.RecyclerView;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -57,10 +58,13 @@ public class GroupEptFragment extends Fragment {
 
         Bundle bundle = getArguments();
         if (bundle != null) {
-            code = bundle.getInt("code");
-            String codeName = bundle.getString("codeName");
-            position = bundle.getInt("group_position");
-            codeText.setText(codeName);
+            if (bundle.getBoolean("add")) {
+                code = bundle.getInt("code");
+                String codeName = bundle.getString("codeName");
+                position = bundle.getInt("group_position");
+                codeText.setText(codeName);
+            }
+
         }
 
 
@@ -84,22 +88,27 @@ public class GroupEptFragment extends Fragment {
         binding.saveCodeSettings.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                String type = typeSpinner.getSelectedItem().toString();
-                int ampl = Integer.parseInt(String.valueOf(codeAmpl.getText()));
-                int time = Integer.parseInt(String.valueOf(codeTime.getText()));
-                GroupFormat groupFormat = new GroupFormat(group);
-                int stepCount = groupFormat.readStepCount();
-                groupFormat.writeStep(type, code, ampl, time, stepCount);
-                groupFormat.writeStepCount(stepCount + 1);
+                if (!TextUtils.isEmpty(codeAmpl.getText()) && !TextUtils.isEmpty(codeTime.getText())) {
+                    String type = typeSpinner.getSelectedItem().toString();
+                    int ampl = Integer.parseInt(String.valueOf(codeAmpl.getText()));
+                    int time = Integer.parseInt(String.valueOf(codeTime.getText()));
+                    GroupFormat groupFormat = new GroupFormat(group);
+                    int stepCount = groupFormat.readStepCount();
+                    groupFormat.writeStep(type, code, ampl, time, stepCount);
+                    groupFormat.writeStepCount(stepCount + 1);
 
-                Log.e(TAG, String.valueOf(stepCount));
-                try {
-                    fileHandler.writeBytesToPosition(group, position);
-                    NavHostFragment.findNavController(GroupEptFragment.this)
-                            .navigate(R.id.action_GroupEptFragment_to_GroupDataFragment);
-                } catch (IOException e) {
-                    throw new RuntimeException(e);
+                    Log.e(TAG, String.valueOf(stepCount));
+                    try {
+                        fileHandler.writeBytesToPosition(group, position);
+                        NavHostFragment.findNavController(GroupEptFragment.this)
+                                .navigate(R.id.action_GroupEptFragment_to_GroupDataFragment);
+                    } catch (IOException e) {
+                        throw new RuntimeException(e);
+                    }
+                } else {
+
                 }
+
 
             }
         });

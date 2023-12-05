@@ -2,10 +2,9 @@ package com.example.nir;
 
 import android.util.Log;
 
-import java.io.File;
-import java.io.IOException;
-import java.io.RandomAccessFile;
+import java.io.*;
 import java.nio.ByteBuffer;
+import java.nio.file.Files;
 import java.util.Arrays;
 
 public class FileHandler {

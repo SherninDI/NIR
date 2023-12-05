@@ -14,11 +14,12 @@
         <activity
                 android:name=".GroupDataActivity"
                 android:exported="false"
-                android:windowSoftInputMode="adjustResize"
+                android:windowSoftInputMode="adjustPan"
                 android:theme="@style/Theme.Nir.NoActionBar"/>
         <activity
                 android:name=".DataActivity"
                 android:exported="false"
+                android:windowSoftInputMode="adjustPan"
                 android:label="@string/data"/>
         <activity
                 android:name=".MainActivity"

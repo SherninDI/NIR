@@ -5,6 +5,7 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -151,95 +152,96 @@ public class GroupSettingsFragment extends Fragment {
             @SuppressLint("NonConstantResourceId")
             @Override
             public void onClick(View v) {
-                groupFormat.writeFileId();
+                if (!TextUtils.isEmpty(editTitle.getText()) && !TextUtils.isEmpty(editTime.getText())) {
+                    groupFormat.writeFileId();
 
-                String title = editTitle.getText().toString();
-                groupFormat.writeTitle(title);
+                    String title = editTitle.getText().toString();
+                    groupFormat.writeTitle(title);
 
-                String time = editTime.getText().toString();
-                groupFormat.writeTime(time);
+                    String time = editTime.getText().toString();
+                    groupFormat.writeTime(time);
 
 
-                switch(modeGroup.getCheckedRadioButtonId()) {
-                    case -1:
-                        Toast.makeText(getActivity(), "Ничего не выбрано",
-                                Toast.LENGTH_SHORT).show();
-                        break;
-                    case R.id.mode_serial:
-                        groupFormat.writeMode((byte) 0x00);
-                        Toast.makeText(getActivity(), "ser",
-                                Toast.LENGTH_SHORT).show();
-                        break;
-                    case R.id.mode_cycle:
-                        groupFormat.writeMode((byte) 0x01);
-                        Toast.makeText(getActivity(), "cyc",
-                                Toast.LENGTH_SHORT).show();
-                        break;
-                    case R.id.mode_complex:
-                        groupFormat.writeMode((byte) 0x02);
-                        Toast.makeText(getActivity(), "comp",
-                                Toast.LENGTH_SHORT).show();
-                        break;
-                }
+                    switch(modeGroup.getCheckedRadioButtonId()) {
+                        case -1:
+                            Toast.makeText(getActivity(), "Ничего не выбрано",
+                                    Toast.LENGTH_SHORT).show();
+                            break;
+                        case R.id.mode_serial:
+                            groupFormat.writeMode((byte) 0x00);
+                            Toast.makeText(getActivity(), "ser",
+                                    Toast.LENGTH_SHORT).show();
+                            break;
+                        case R.id.mode_cycle:
+                            groupFormat.writeMode((byte) 0x01);
+                            Toast.makeText(getActivity(), "cyc",
+                                    Toast.LENGTH_SHORT).show();
+                            break;
+                        case R.id.mode_complex:
+                            groupFormat.writeMode((byte) 0x02);
+                            Toast.makeText(getActivity(), "comp",
+                                    Toast.LENGTH_SHORT).show();
+                            break;
+                    }
 
-                switch(spectreGroup.getCheckedRadioButtonId()) {
-                    case -1:
-                        Toast.makeText(getActivity(), "Ничего не выбрано",
-                                Toast.LENGTH_SHORT).show();
-                        break;
-                    case R.id.spectre_disable:
-                        groupFormat.writeSpectre((byte) 0x00);
-                        Toast.makeText(getActivity(), "dis",
-                                Toast.LENGTH_SHORT).show();
-                        break;
-                    case R.id.spectre_enable1:
-                        groupFormat.writeSpectre((byte) 0x01);
-                        Toast.makeText(getActivity(), "en1",
-                                Toast.LENGTH_SHORT).show();
-                        break;
-                    case R.id.spectre_enable2:
-                        groupFormat.writeSpectre((byte) 0x02);
-                        Toast.makeText(getActivity(), "en2",
-                                Toast.LENGTH_SHORT).show();
-                        break;
-                }
+                    switch(spectreGroup.getCheckedRadioButtonId()) {
+                        case -1:
+                            Toast.makeText(getActivity(), "Ничего не выбрано",
+                                    Toast.LENGTH_SHORT).show();
+                            break;
+                        case R.id.spectre_disable:
+                            groupFormat.writeSpectre((byte) 0x00);
+                            Toast.makeText(getActivity(), "dis",
+                                    Toast.LENGTH_SHORT).show();
+                            break;
+                        case R.id.spectre_enable1:
+                            groupFormat.writeSpectre((byte) 0x01);
+                            Toast.makeText(getActivity(), "en1",
+                                    Toast.LENGTH_SHORT).show();
+                            break;
+                        case R.id.spectre_enable2:
+                            groupFormat.writeSpectre((byte) 0x02);
+                            Toast.makeText(getActivity(), "en2",
+                                    Toast.LENGTH_SHORT).show();
+                            break;
+                    }
 
-                switch(freqGroup.getCheckedRadioButtonId()) {
-                    case -1:
-                        Toast.makeText(getActivity(), "Ничего не выбрано",
-                                Toast.LENGTH_SHORT).show();
-                        break;
-                    case R.id.freq_1100:
-                        groupFormat.writeMaxFreq((byte) 0x01);
-                        Toast.makeText(getActivity(), "1100",
-                                Toast.LENGTH_SHORT).show();
-                        break;
-                    case R.id.freq_1200:
-                        groupFormat.writeMaxFreq((byte) 0x02);
-                        Toast.makeText(getActivity(), "1200",
-                                Toast.LENGTH_SHORT).show();
-                        break;
-                    case R.id.freq_1500:
-                        groupFormat.writeMaxFreq((byte) 0x03);
-                        Toast.makeText(getActivity(), "1500",
-                                Toast.LENGTH_SHORT).show();
-                        break;
-                    case R.id.freq_15000:
-                        groupFormat.writeMaxFreq((byte) 0x00);
-                        Toast.makeText(getActivity(), "15000",
-                                Toast.LENGTH_SHORT).show();
-                        break;
-                }
+                    switch(freqGroup.getCheckedRadioButtonId()) {
+                        case -1:
+                            Toast.makeText(getActivity(), "Ничего не выбрано",
+                                    Toast.LENGTH_SHORT).show();
+                            break;
+                        case R.id.freq_1100:
+                            groupFormat.writeMaxFreq((byte) 0x01);
+                            Toast.makeText(getActivity(), "1100",
+                                    Toast.LENGTH_SHORT).show();
+                            break;
+                        case R.id.freq_1200:
+                            groupFormat.writeMaxFreq((byte) 0x02);
+                            Toast.makeText(getActivity(), "1200",
+                                    Toast.LENGTH_SHORT).show();
+                            break;
+                        case R.id.freq_1500:
+                            groupFormat.writeMaxFreq((byte) 0x03);
+                            Toast.makeText(getActivity(), "1500",
+                                    Toast.LENGTH_SHORT).show();
+                            break;
+                        case R.id.freq_15000:
+                            groupFormat.writeMaxFreq((byte) 0x00);
+                            Toast.makeText(getActivity(), "15000",
+                                    Toast.LENGTH_SHORT).show();
+                            break;
+                    }
 
-                byte[] result = groupFormat.getBytes();
-                // save to file
-                try {
-                    fileHandler.writeBytesToPosition(result, position);
-                } catch (IOException e) {
-                    throw new RuntimeException(e);
-                } finally {
-                    fileHandler.close();
-                }
+                    byte[] result = groupFormat.getBytes();
+                    // save to file
+                    try {
+                        fileHandler.writeBytesToPosition(result, position);
+                    } catch (IOException e) {
+                        throw new RuntimeException(e);
+                    } finally {
+                        fileHandler.close();
+                    }
 
 //                Log.e(TAG, bytesToHex(result));
 //                Log.e(TAG, new String(result, Charset.forName("windows-1251")));
@@ -252,11 +254,15 @@ public class GroupSettingsFragment extends Fragment {
 
 
 
-                Bundle bundle = new Bundle();
-                bundle.putInt("group_position", position);
-                bundle.putString("group_name", groupFormat.readTitle());
-                NavHostFragment.findNavController(GroupSettingsFragment.this)
-                        .navigate(R.id.action_GroupSettingsFragment_to_GroupDataFragment, bundle);
+                    Bundle bundle = new Bundle();
+                    bundle.putInt("group_position", position);
+                    bundle.putString("group_name", groupFormat.readTitle());
+                    NavHostFragment.findNavController(GroupSettingsFragment.this)
+                            .navigate(R.id.action_GroupSettingsFragment_to_GroupDataFragment, bundle);
+                } else {
+
+                }
+
             }
         });
     }

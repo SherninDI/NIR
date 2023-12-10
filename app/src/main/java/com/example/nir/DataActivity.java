@@ -229,46 +229,46 @@ public class DataActivity extends AppCompatActivity {
 //            }
 //        });
 
-//        usbManager = (UsbManager) getSystemService(Context.USB_SERVICE);
-//        UsbDevice usbDevice = findDevice();
-//        PendingIntent mPermissionIntent = PendingIntent.getBroadcast(this, 0, new Intent(ACTION_USB_PERMISSION), 0);
-//        IntentFilter filter = new IntentFilter(ACTION_USB_PERMISSION);
-//        registerReceiver(usbReceiver, filter);
-//        if (usbDevice != null) {
-//            this.usbDevice = usbDevice;
-//            registerReceiver(usbReceiver, filter);
-//            usbManager.requestPermission(this.usbDevice, mPermissionIntent);
-//            for (int intf = 0; intf < this.usbDevice.getInterfaceCount(); intf++) {
-//                usbInterface = this.usbDevice.getInterface(intf);
-//                if (usbInterface.getInterfaceClass() == UsbConstants.USB_CLASS_CDC_DATA) {
-//                    for (int nEp = 0; nEp < usbInterface.getEndpointCount(); nEp++) {
-//                        UsbEndpoint tmpEndpoint = usbInterface.getEndpoint(nEp);
-//                        if (tmpEndpoint.getType() != UsbConstants.USB_ENDPOINT_XFER_BULK) continue;
-//
-//                        if ((outEndpoint == null)
-//                                && (tmpEndpoint.getDirection() == UsbConstants.USB_DIR_OUT)) {
-//                            outEndpoint = tmpEndpoint;
-//                            System.out.println("endpO" + outEndpoint.getMaxPacketSize());
-//                        } else if ((inEndpoint == null)
-//                                && (tmpEndpoint.getDirection() == UsbConstants.USB_DIR_IN)) {
-//                            inEndpoint = tmpEndpoint;
-//                            System.out.println("endpI" + inEndpoint.getMaxPacketSize());
-//                        }
-//                    }
-//                    if (outEndpoint == null) {
-//                        Toast.makeText(this, "no endpoints", Toast.LENGTH_LONG).show();
-//                    }
-//                    usbConnection = usbManager.openDevice(this.usbDevice);
-//                    if (usbConnection == null) {
-//                        Toast.makeText(this, "can't open device", Toast.LENGTH_SHORT).show();
-//                        return;
-//                    } else {
-//                        usbConnection.claimInterface(usbInterface, true);
-//                        startIoManager();
-//                    }
-//                }
-//            }
-//        }
+        usbManager = (UsbManager) getSystemService(Context.USB_SERVICE);
+        UsbDevice usbDevice = findDevice();
+        PendingIntent mPermissionIntent = PendingIntent.getBroadcast(this, 0, new Intent(ACTION_USB_PERMISSION), 0);
+        IntentFilter filter = new IntentFilter(ACTION_USB_PERMISSION);
+        registerReceiver(usbReceiver, filter);
+        if (usbDevice != null) {
+            this.usbDevice = usbDevice;
+            registerReceiver(usbReceiver, filter);
+            usbManager.requestPermission(this.usbDevice, mPermissionIntent);
+            for (int intf = 0; intf < this.usbDevice.getInterfaceCount(); intf++) {
+                usbInterface = this.usbDevice.getInterface(intf);
+                if (usbInterface.getInterfaceClass() == UsbConstants.USB_CLASS_CDC_DATA) {
+                    for (int nEp = 0; nEp < usbInterface.getEndpointCount(); nEp++) {
+                        UsbEndpoint tmpEndpoint = usbInterface.getEndpoint(nEp);
+                        if (tmpEndpoint.getType() != UsbConstants.USB_ENDPOINT_XFER_BULK) continue;
+
+                        if ((outEndpoint == null)
+                                && (tmpEndpoint.getDirection() == UsbConstants.USB_DIR_OUT)) {
+                            outEndpoint = tmpEndpoint;
+                            System.out.println("endpO" + outEndpoint.getMaxPacketSize());
+                        } else if ((inEndpoint == null)
+                                && (tmpEndpoint.getDirection() == UsbConstants.USB_DIR_IN)) {
+                            inEndpoint = tmpEndpoint;
+                            System.out.println("endpI" + inEndpoint.getMaxPacketSize());
+                        }
+                    }
+                    if (outEndpoint == null) {
+                        Toast.makeText(this, "no endpoints", Toast.LENGTH_LONG).show();
+                    }
+                    usbConnection = usbManager.openDevice(this.usbDevice);
+                    if (usbConnection == null) {
+                        Toast.makeText(this, "can't open device", Toast.LENGTH_SHORT).show();
+                        return;
+                    } else {
+                        usbConnection.claimInterface(usbInterface, true);
+                        startIoManager();
+                    }
+                }
+            }
+        }
 
     }
 
@@ -293,24 +293,58 @@ public class DataActivity extends AppCompatActivity {
     @Override
     protected void onDestroy() {
         super.onDestroy();
-//        if (usbManager != null) {
-//            stopIoManager();
-//            usbConnection.close();
-//            timer.cancel();
-//            unregisterReceiver(usbReceiver);
-//        }
+        if (usbManager != null) {
+            stopIoManager();
+            usbConnection.close();
+            timer.cancel();
+            unregisterReceiver(usbReceiver);
+        }
         databaseAdapter.close();
     }
 
     private void updateReceivedData(byte[] data) {
+        int blockSize = 11;
+        int blockCount = data.length / blockSize;
+
+        byte[] range = null;
+            for (int i = 0; i < blockCount; i++) {
+                int idx = i * blockSize;
+                range = Arrays.copyOfRange(data, idx, idx + blockSize);
+
+                switch (range[1]) {
+                    case (byte) Constants.SYS_STAT:
+
+                        break;
+                    case (byte) Constants.SYS_RUN:
+                        Log.i(TAG, "SYS_RUN " + bytesToHex(range));
+                        break;
+                    case (byte) Constants.SYS_FILE:
+                        Log.i(TAG, "SYS_FILE " + bytesToHex(range));
+                        break;
+                    case (byte) Constants.SYS_DATA:
+
+                        byte[] res = Arrays.copyOfRange(range,2,10);
+                        Log.i(TAG, "SYS_DATA " + bytesToHex(res));
+                        break;
+                    default: break;
+                }
+
+
+
+        }
+
+
+
+
         final String message = "Read " + data.length + " bytes: \n"
                 + HexDump.dumpHexString(data) + "\n\n";
 //        Log.d(TAG, message);
+
     }
 
     private void sendMessage(byte[] command) {
         if (inputOutputManager == null) {
-            Toast.makeText(this, "mInputOutputManager == null", Toast.LENGTH_LONG).show();
+//            Toast.makeText(this, "mInputOutputManager == null", Toast.LENGTH_LONG).show();
             return;
         }
         try {
@@ -329,18 +363,18 @@ public class DataActivity extends AppCompatActivity {
             switch (message.what) {
                 case Constants.SYS_NOP:
                     command = commandFormat.getCommand(Constants.SYS_NOP, data);
-//                    sendMessage(command);
-                    Log.e(TAG, "SYS_NOP " + bytesToHex(command));
+                    sendMessage(command);
+//                    Log.e(TAG, "SYS_NOP " + bytesToHex(command));
                     break;
                 case Constants.SYS_RESET:
                     command = commandFormat.getCommand(Constants.SYS_RESET, data);
-//                    sendMessage(command);
+                    sendMessage(command);
                     Log.e(TAG, "SYS_RESET " + bytesToHex(command));
                     break;
                 case Constants.SYS_PUT:
                     byte[] buf = (byte[]) message.obj;
                     command = commandFormat.getCommand(Constants.SYS_PUT, buf);
-//                    sendMessage(command);
+                    sendMessage(command);
                     Log.e(TAG, "SYS_PUT " + bytesToHex(command));
 
                     int blockSize = 8;
@@ -354,17 +388,17 @@ public class DataActivity extends AppCompatActivity {
                     break;
                 case Constants.SYS_GET:
                     command = commandFormat.getCommand(Constants.SYS_GET, data);
-//                    sendMessage(command);
+                    sendMessage(command);
                     Log.e(TAG, "SYS_GET " + bytesToHex(command));
                     break;
                 case Constants.SYS_CANCEL:
                     command = commandFormat.getCommand(Constants.SYS_CANCEL, data);
-//                    inputOutputManager.writeAsync(command);
+                    inputOutputManager.writeAsync(command);
                     Log.e(TAG, "SYS_CANCEL " + bytesToHex(command));
                     break;
                 case Constants.SYS_DATA:
                     command = commandFormat.getCommand(Constants.SYS_DATA, (byte[])message.obj);
-//                    sendMessage(command);
+                    sendMessage(command);
                     Log.e(TAG, "SYS_DATA " + bytesToHex(command) + " " + message.arg1);
                     break;
             }

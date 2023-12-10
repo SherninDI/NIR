@@ -20,7 +20,7 @@ public class CommandFormat {
             case Constants.SYS_PUT:
                 ByteBuffer putDataBuffer = ByteBuffer.allocate(9);
                 putDataBuffer.put((byte)Constants.SYS_PUT);
-                putDataBuffer.put("EG01".getBytes(StandardCharsets.UTF_8));
+                putDataBuffer.put("EG**".getBytes(StandardCharsets.UTF_8));
                 byte[] revLenByte = reverseByteArray(ByteBuffer.allocate(4).putInt(data.length).array());
                 putDataBuffer.put(revLenByte);
                 data = putDataBuffer.array();
@@ -29,7 +29,7 @@ public class CommandFormat {
             case Constants.SYS_GET:
                 ByteBuffer getBuffer = ByteBuffer.allocate(9);
                 getBuffer.put((byte)Constants.SYS_GET);
-                getBuffer.put("EG01".getBytes(StandardCharsets.UTF_8));
+                getBuffer.put("EG**".getBytes(StandardCharsets.UTF_8));
                 byte[] nulls = new byte[4];
                 getBuffer.put(nulls);
                 command = generateCommand(getBuffer.array());

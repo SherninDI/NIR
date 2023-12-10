@@ -56,10 +56,10 @@ public class MainActivity extends AppCompatActivity {
         connect.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-//                if (usbDevice != null) {
-//                    Intent intent = new Intent(getApplicationContext(), DataActivity.class);
-//                    startActivity(intent);
-//                }
+                if (usbDevice != null) {
+                    Intent intent = new Intent(getApplicationContext(), DataActivity.class);
+                    startActivity(intent);
+                }
                 Intent intent = new Intent(getApplicationContext(), DataActivity.class);
                 startActivity(intent);
             }

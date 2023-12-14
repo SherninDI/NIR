@@ -51,6 +51,8 @@
     <string name="type_text">Тип записи</string>
     <string name="codes">Справочник</string>
     <string name="search_text">Введите название или код</string>
+    <string name="ampl">Амплитуда</string>
+    <string name="step">Время шага</string>
     <!-- Strings used for fragments for navigation -->
     <string name="next">Next</string>
     <string name="previous">Previous</string>

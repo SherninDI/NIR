@@ -7,6 +7,8 @@ import java.nio.ByteBuffer;
 import java.nio.charset.Charset;
 import java.util.Arrays;
 
+import static com.example.nir.DataActivity.bytesToHex;
+
 public class GroupFormat {
     private byte[] byteArray;
     private CheckSum checkSum = new CheckSum();
@@ -112,7 +114,7 @@ public class GroupFormat {
         byte[] amplBytes = BigInteger.valueOf(ampl).toByteArray();
         writeBytes(amplBytes, 27 + stepPos * 6 + 3);
         byte[] stepTimeBytes = reverseByteArray(BigInteger.valueOf(stepTime).toByteArray());
-        writeBytes(stepTimeBytes, 27 + stepPos * 6 + 5);
+        writeBytes(stepTimeBytes, 27 + stepPos * 6 + 4);
     }
 
     public void writeAmpl(int ampl, int stepPos) {
@@ -127,11 +129,11 @@ public class GroupFormat {
 
     public void writeStepTime(int stepTime, int stepPos) {
         byte[] stepTimeBytes = reverseByteArray(BigInteger.valueOf(stepTime).toByteArray());
-        writeBytes(stepTimeBytes, 27 + stepPos * 6 + 5);
+        writeBytes(stepTimeBytes, 27 + stepPos * 6 + 4);
     }
 
     public int readStepTime(int stepPos) {
-        byte[] stepTimeBytes = readBytes(2,27 + stepPos * 6 + 5);
+        byte[] stepTimeBytes =  reverseByteArray(readBytes(2,27 + stepPos * 6 + 4));
         return new BigInteger(stepTimeBytes).intValue();
     }
 
@@ -148,18 +150,19 @@ public class GroupFormat {
     public void deleteStep(int position) {
         int stepLength = 6;
         int stepsLength = 480;
+        int stepsPos = 27;
         byte[] step = new byte[stepLength];
-        int afterPos = (position + 1) * stepLength;
-        int beforePosStart = 0;
-        int beforePosEnd = position * stepLength;
+        int afterPos = stepsPos + (position + 1) * stepLength;
+        int beforePosStart = stepsPos;
+        int beforePosEnd = beforePosStart + position * stepLength;
         if (position == 0) {
             byte[] after = readBytes(stepsLength - stepLength, afterPos);
             writeBytes(after, beforePosStart);
             writeBytes(step, stepsLength - stepLength);
 
         } else {
-            byte[] before = readBytes(beforePosEnd, beforePosStart);
-            byte[] after = readBytes(stepsLength - afterPos, afterPos);
+            byte[] before = readBytes(stepLength * position, beforePosStart);
+            byte[] after = readBytes(stepsLength - (position + 1) * stepLength, afterPos);
             writeBytes(before, beforePosStart);
             writeBytes(after, beforePosEnd);
             writeBytes(step, stepsLength - stepLength);

@@ -2,6 +2,63 @@
 <android.support.constraint.ConstraintLayout
         xmlns:android="http://schemas.android.com/apk/res/android"
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:padding="20dp"
+        android:layout_height="match_parent" xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:ems="10"
+            android:gravity="top"
+            android:textSize="16sp"
+            android:layout_marginTop="5dp"
+            android:id="@+id/text_ampl"
+            android:text="@string/ampl"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toTopOf="@+id/step_ampl"/>
+
+    <EditText
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:inputType="number"
+            android:textSize="20sp"
+            android:layout_marginTop="5dp"
+            android:gravity="top"
+            android:id="@+id/step_ampl"
+            android:hint="@string/ampl_hint"
+            app:layout_constraintTop_toBottomOf="@id/text_ampl"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintBottom_toTopOf="@+id/text_step"/>
+
+    <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:ems="10"
+            android:gravity="top"
+            android:textSize="16sp"
+            android:layout_marginTop="5dp"
+            android:id="@+id/text_step"
+            android:text="@string/step"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/step_ampl"
+            app:layout_constraintBottom_toTopOf="@+id/step_time"/>
+
+    <EditText
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:inputType="number"
+            android:ems="10"
+            android:gravity="top"
+            android:textSize="20sp"
+            android:layout_marginTop="5dp"
+            android:id="@+id/step_time"
+            android:hint="@string/step_time_hint"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/text_step"/>
 
 </android.support.constraint.ConstraintLayout>

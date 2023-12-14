@@ -43,6 +43,17 @@ public class GroupEptFragment extends Fragment {
         return binding.getRoot();
     }
 
+    public static String bytesToHex(byte[] byteArray)
+    {
+        String hex = "";
+        // Iterating through each byte in the array
+        for (byte i : byteArray) {
+            hex += String.format("%02X", i);
+            hex += " ";
+        }
+        return hex;
+    }
+
     public void onViewCreated(@NonNull View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         TextView codeText = view.findViewById(R.id.text_code);
@@ -58,16 +69,14 @@ public class GroupEptFragment extends Fragment {
 
         Bundle bundle = getArguments();
         if (bundle != null) {
-            if (bundle.getBoolean("add")) {
-                code = bundle.getInt("code");
-                String codeName = bundle.getString("codeName");
-                position = bundle.getInt("group_position");
-                codeText.setText(codeName);
-            }
-
+//            if (bundle.getBoolean("add")) {
+//
+//            }
+            code = bundle.getInt("code");
+            String codeName = bundle.getString("codeName");
+            codeText.setText(codeName);
+            position = bundle.getInt("group_position");
         }
-
-
 
         file = new File(getActivity().getFilesDir(), "groups.grf");
         fileHandler = new FileHandler(file);
@@ -77,9 +86,13 @@ public class GroupEptFragment extends Fragment {
             throw new RuntimeException(e);
         }
 
+        Log.e(TAG, "group "+ position+" " + bytesToHex(group));
+
         binding.codes.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                Bundle bundle = new Bundle();
+                bundle.putInt("group_position", position);
                 NavHostFragment.findNavController(GroupEptFragment.this)
                         .navigate(R.id.action_GroupEptFragment_to_CodesFragment, bundle);
             }

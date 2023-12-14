@@ -99,11 +99,11 @@ public class MainActivity extends AppCompatActivity {
             ));
             for (int intf = 0; intf < device.getInterfaceCount(); intf++) {
                 UsbInterface usbInterface = device.getInterface(intf);
-                String inter = "Протокол" + usbInterface.getName() + "\n";
-                chars.append(inter).append(usbInterface.getInterfaceProtocol()).append("\n").append(usbInterface.getEndpointCount()).append("\n");
+                String inter = "\nПротокол " + usbInterface.getName() + "\n";
+                chars.append(inter).append("\nКоличество конечных точек ").append(usbInterface.getEndpointCount()).append("\n");
                 for (int nEp = 0; nEp < usbInterface.getEndpointCount(); nEp++) {
                     UsbEndpoint tmpEndpoint = usbInterface.getEndpoint(nEp);
-                    chars.append(tmpEndpoint.getType()).append("\n").append(tmpEndpoint.getDirection()).append("\n").append(tmpEndpoint.getMaxPacketSize()).append("\n");
+                    chars.append("Тип кон. точки ").append(tmpEndpoint.getType()).append("\nНаправление кон. точки ").append(tmpEndpoint.getDirection()).append("\nРазмер кон. точки ").append(tmpEndpoint.getMaxPacketSize()).append("\n");
                 }
             }
             deviceText.setText(getString(R.string.device_found, device.getProductName()));

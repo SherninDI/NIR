@@ -22,30 +22,24 @@ import android.widget.Toast;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.ByteBuffer;
 import java.util.*;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 public class DataActivity extends AppCompatActivity {
     private final String TAG = DataActivity.class.getSimpleName();
-    Button send;
-    Button receive;
-    Button add;
-    Button save;
-    Button reset;
-    Button cancel;
-
-    RecyclerView groupList;
-    GroupAdapter groupAdapter;
+    private Button send;
+    private Button receive;
+    private Button add;
+    private Button save;
+    private Button reset;
+    private Button cancel;
+    private RecyclerView groupList;
+    private GroupAdapter groupAdapter;
     private List<String> groups = new ArrayList<>();
-
-    private DatabaseAdapter databaseAdapter;
-    private List<String> subgroups = new ArrayList<String>();
-
-
     private File file;
     private FileHandler fileHandler;
-
     private byte[] groupsByte = new byte[51200];
     private byte[] group = new byte[512];
     private int groupSize = 512;
@@ -77,7 +71,6 @@ public class DataActivity extends AppCompatActivity {
     private UsbEndpoint outEndpoint;
     private UsbDeviceConnection usbConnection;
     private InputOutputManager inputOutputManager;
-
     CommandFormat commandFormat;
     InputOutputManager.Listener listener = new InputOutputManager.Listener() {
         @Override
@@ -97,14 +90,12 @@ public class DataActivity extends AppCompatActivity {
     };
 
     UsbDevice findDevice() {
-
         HashMap<String, UsbDevice> deviceList = this.usbManager.getDeviceList();
         Iterator<UsbDevice> deviceIterator = deviceList.values().iterator();
         while(deviceIterator.hasNext()){
             UsbDevice device = deviceIterator.next();
             return device;
         }
-
         return null;
     }
 
@@ -116,10 +107,16 @@ public class DataActivity extends AppCompatActivity {
         }
     };
 
+    ByteBuffer groupDataBuffer;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_data);
+
+        byte[] groupData = new byte[51200];
+        groupDataBuffer = ByteBuffer.wrap(groupData);
+
         commandFormat = new CommandFormat();
 
         send = findViewById(R.id.send);
@@ -131,41 +128,26 @@ public class DataActivity extends AppCompatActivity {
 
         groupList = findViewById(R.id.group_list);
 
-        databaseAdapter = new DatabaseAdapter(this);
-        databaseAdapter.createDataBase();
-        databaseAdapter.openDataBase();
 
         file = new File(this.getFilesDir(), "groups.grf");
         fileHandler = new FileHandler(file);
-        try {
-            groupsByte = fileHandler.readBytes(51200);
-            for (int i = 0; i < groupsByte.length / groupSize; i++) {
-                group = fileHandler.readBytesFromPosition(i);
-                GroupFormat groupFormat = new GroupFormat(group);
-                if (groupFormat.readTitleLength() != 0) {
-                    groups.add(groupFormat.readTitle());
-                }
-//                Log.i(TAG, i + " " + bytesToHex(group));
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
+        showGroups();
 
         if (groups.size() != 0) {
-            groupAdapter = new GroupAdapter(this, groups);
+            groupAdapter = new GroupAdapter(getApplicationContext(), groups);
             groupList.setAdapter(groupAdapter);
             groupAdapter.notifyDataSetChanged();
             groupAdapter.setOnGroupClickListener(new GroupAdapter.GroupClickListener() {
                 @Override
                 public void onGroupClick(int position, View itemView) {
                     TextView textView = (TextView) itemView.findViewById(R.id.tvGroupName) ;
-//                Log.e(TAG, textView.getText().toString());
                     Intent intent = new Intent(DataActivity.this, GroupDataActivity.class);
-                    intent.putExtra("group", position);
-                    intent.putExtra("new", false);
-                    intent.putExtra("name", textView.getText().toString());
+                    intent.putExtra("group_position", position);
+//                    intent.putExtra("new", false);
+//                    intent.putExtra("name", textView.getText().toString());
                     startActivity(intent);
+
+                    Log.e(TAG,"click group pos " + position);
                 }
             });
         }
@@ -175,16 +157,44 @@ public class DataActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(DataActivity.this, GroupDataActivity.class);
-                intent.putExtra("new", true);
-                intent.putExtra("size", groups.size());
+//                intent.putExtra("new", true);
+                intent.putExtra("group_position", groups.size());
                 startActivity(intent);
-//                Log.e(TAG, String.valueOf(groups.size()));
+                Log.e(TAG, "add group pos " + String.valueOf(groups.size()));
             }
         });
 
         save.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                try {
+                    fileHandler.writeBytesToPosition(groupData, 0);
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
+//                groups.clear();
+                showGroups();
+
+                if (groupAdapter == null) {
+                    groupAdapter = new GroupAdapter(getApplicationContext(), groups);
+                    groupList.setAdapter(groupAdapter);
+                    groupAdapter.notifyDataSetChanged();
+
+                    groupAdapter.setOnGroupClickListener(new GroupAdapter.GroupClickListener() {
+                        @Override
+                        public void onGroupClick(int position, View itemView) {
+                            TextView textView = (TextView) itemView.findViewById(R.id.tvGroupName) ;
+                            Intent intent = new Intent(DataActivity.this, GroupDataActivity.class);
+                            intent.putExtra("group_position", position);
+                            startActivity(intent);
+
+                            Log.e(TAG,"click group pos " + position);
+                        }
+                    });
+                }
+
+
+
             }
         });
 
@@ -192,13 +202,16 @@ public class DataActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 commandsHandler.obtainMessage(Constants.SYS_PUT, groupsByte.length,-1, groupsByte).sendToTarget();
+                Toast.makeText(getApplicationContext(), "Данные отправлены", Toast.LENGTH_SHORT).show();
             }
         });
 
         receive.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                groupList.setAdapter(null);
                 commandsHandler.obtainMessage(Constants.SYS_GET).sendToTarget();
+                Toast.makeText(getApplicationContext(), "Данные получены", Toast.LENGTH_SHORT).show();
             }
         });
 
@@ -206,7 +219,9 @@ public class DataActivity extends AppCompatActivity {
         reset.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+
                 commandsHandler.obtainMessage(Constants.SYS_RESET).sendToTarget();
+                Toast.makeText(getApplicationContext(), "Аппарат готов к управлению", Toast.LENGTH_SHORT).show();
             }
         });
 
@@ -214,20 +229,10 @@ public class DataActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 commandsHandler.obtainMessage(Constants.SYS_CANCEL).sendToTarget();
+                Toast.makeText(getApplicationContext(), "Отмена", Toast.LENGTH_SHORT).show();
             }
         });
 
-//        button.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//                Intent intent = new Intent(getApplicationContext(), GroupActivity.class);
-//                startActivity(intent);
-////                subgroups = databaseAdapter.getAllSubgroups(1);
-////                for (String subgroup: subgroups) {
-////                    Log.d(TAG,subgroup);
-////                }
-//            }
-//        });
 
         usbManager = (UsbManager) getSystemService(Context.USB_SERVICE);
         UsbDevice usbDevice = findDevice();
@@ -272,6 +277,23 @@ public class DataActivity extends AppCompatActivity {
 
     }
 
+    private void showGroups() {
+        try {
+            groupsByte = fileHandler.readBytes(51200);
+            for (int i = 0; i < groupsByte.length / groupSize; i++) {
+                group = fileHandler.readBytesFromPosition(i);
+                GroupFormat groupFormat = new GroupFormat(group);
+                if (groupFormat.readTitleLength() != 0) {
+                    groups.add(groupFormat.readTitle());
+                }
+//                Log.i(TAG, i + " " + bytesToHex(group));
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+    }
+
     private void stopIoManager() {
         if (inputOutputManager != null) {
             Log.i(TAG, "Stopping io manager ..");
@@ -299,10 +321,12 @@ public class DataActivity extends AppCompatActivity {
             timer.cancel();
             unregisterReceiver(usbReceiver);
         }
-        databaseAdapter.close();
     }
 
+
     private void updateReceivedData(byte[] data) {
+
+
         int blockSize = 11;
         int blockCount = data.length / blockSize;
 
@@ -324,6 +348,7 @@ public class DataActivity extends AppCompatActivity {
                     case (byte) Constants.SYS_DATA:
 
                         byte[] res = Arrays.copyOfRange(range,2,10);
+                        groupDataBuffer.put(res);
                         Log.i(TAG, "SYS_DATA " + bytesToHex(res));
                         break;
                     default: break;

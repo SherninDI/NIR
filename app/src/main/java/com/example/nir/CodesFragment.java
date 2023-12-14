@@ -25,6 +25,8 @@ public class CodesFragment extends Fragment {
 
     private int code;
     private String codeName;
+
+    private int position;
     @Override
     public View onCreateView(
             LayoutInflater inflater, ViewGroup container,
@@ -36,6 +38,11 @@ public class CodesFragment extends Fragment {
 
     public void onViewCreated(@NonNull View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+
+        Bundle bundle = getArguments();
+        if (bundle != null) {
+            position = bundle.getInt("group_position");
+        }
 
         EditText searchText = view.findViewById(R.id.text_search_code);
         RecyclerView eptList = view.findViewById(R.id.code_list);
@@ -80,7 +87,8 @@ public class CodesFragment extends Fragment {
                 Bundle bundle = new Bundle();
                 bundle.putInt("code", code);
                 bundle.putString("codeName", codeName);
-                bundle.putBoolean("add", true);
+//                bundle.putBoolean("add", true);
+                bundle.putInt("group_position", position);
                 NavHostFragment.findNavController(CodesFragment.this)
                         .navigate(R.id.action_CodesFragment_to_GroupEptFragment, bundle);
             }
@@ -89,7 +97,10 @@ public class CodesFragment extends Fragment {
         binding.cancelEpt.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
+                Bundle bundle = new Bundle();
+                bundle.putInt("group_position", position);
+                NavHostFragment.findNavController(CodesFragment.this)
+                        .navigate(R.id.action_CodesFragment_to_GroupEptFragment, bundle);
             }
         });
 

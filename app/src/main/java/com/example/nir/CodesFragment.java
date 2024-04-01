@@ -13,8 +13,7 @@ import androidx.navigation.fragment.NavHostFragment;
 import com.example.nir.databinding.FragmentCodesBinding;
 
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 public class CodesFragment extends Fragment {
     private final String TAG = CodesFragment.class.getSimpleName();
@@ -33,6 +32,7 @@ public class CodesFragment extends Fragment {
             Bundle savedInstanceState
     ) {
         binding = FragmentCodesBinding.inflate(inflater, container, false);
+        setHasOptionsMenu(false);
         return binding.getRoot();
     }
 
@@ -70,6 +70,7 @@ public class CodesFragment extends Fragment {
                     ept = databaseAdapter.getAllEptById(position - 1);
                 }
 
+                Collections.sort(ept);
                 eptAdapter = new EptAdapter(getActivity(), ept);
                 eptList.setAdapter(eptAdapter);
                 onClickListener();
@@ -100,7 +101,7 @@ public class CodesFragment extends Fragment {
                 Bundle bundle = new Bundle();
                 bundle.putInt("group_position", position);
                 NavHostFragment.findNavController(CodesFragment.this)
-                        .navigate(R.id.action_CodesFragment_to_GroupEptFragment, bundle);
+                        .navigate(R.id.action_CodesFragment_to_GroupDataFragment, bundle);
             }
         });
 
@@ -118,6 +119,7 @@ public class CodesFragment extends Fragment {
         });
 
     }
+
 
     private void onClickListener() {
         if (ept.size() != 0) {

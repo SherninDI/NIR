@@ -4,6 +4,7 @@ import android.os.Bundle;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
+import android.view.Menu;
 import android.view.View;
 import android.widget.Button;
 import androidx.navigation.NavController;
@@ -59,7 +60,12 @@ public class GroupDataActivity extends AppCompatActivity implements GroupSetting
 
     }
 
-
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        // Inflate the menu; this adds items to the action bar if it is present.
+        getMenuInflater().inflate(R.menu.ept_menu, menu);
+        return true;
+    }
 
     @Override
     public boolean onSupportNavigateUp() {

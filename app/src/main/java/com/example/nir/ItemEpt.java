@@ -1,11 +1,11 @@
 package com.example.nir;
 
-public class ItemEpt {
+public class ItemEpt implements Comparable<ItemEpt> {
     private String eptNameText;
     private String eptValueText;
-    private int eptValue;
+    Integer eptValue;
 
-    public int getEptValue() {
+    public Integer getEptValue() {
         return eptValue;
     }
 
@@ -31,5 +31,11 @@ public class ItemEpt {
             value %= 1000;
             eptValueText = "A"+ value;
         }
+    }
+
+
+    @Override
+    public int compareTo(ItemEpt o) {
+        return this.eptValue.compareTo(o.eptValue);
     }
 }

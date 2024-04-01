@@ -25,8 +25,8 @@
                 android:id="@+id/action_GroupDataFragment_to_GroupSettingsFragment"
                 app:destination="@id/GroupSettingsFragment"/>
         <action
-                android:id="@+id/action_GroupDataFragment_to_GroupEptFragment"
-                app:destination="@id/GroupEptFragment"/>
+                android:id="@+id/action_GroupDataFragment_to_CodesFragment"
+                app:destination="@id/CodesFragment"/>
     </fragment>
 
     <fragment
@@ -38,9 +38,9 @@
                 android:id="@+id/action_GroupEptFragment_to_GroupDataFragment"
                 app:destination="@id/GroupDataFragment"/>
 
-        <action
-                android:id="@+id/action_GroupEptFragment_to_CodesFragment"
-                app:destination="@id/CodesFragment"/>
+<!--        <action-->
+<!--                android:id="@+id/action_GroupEptFragment_to_CodesFragment"-->
+<!--                app:destination="@id/CodesFragment"/>-->
     </fragment>
 
 
@@ -52,6 +52,9 @@
         <action
                 android:id="@+id/action_CodesFragment_to_GroupEptFragment"
                 app:destination="@id/GroupEptFragment"/>
+        <action
+                android:id="@+id/action_CodesFragment_to_GroupDataFragment"
+                app:destination="@id/GroupDataFragment"/>
     </fragment>
 
 

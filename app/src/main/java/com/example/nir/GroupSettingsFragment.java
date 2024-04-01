@@ -72,6 +72,7 @@ public class GroupSettingsFragment extends Fragment {
             Bundle savedInstanceState
     ) {
         binding = FragmentGroupSettingsBinding.inflate(inflater, container, false);
+        setHasOptionsMenu(false);
         return binding.getRoot();
     }
 

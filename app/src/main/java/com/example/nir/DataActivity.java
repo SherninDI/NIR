@@ -245,8 +245,6 @@ public class DataActivity extends AppCompatActivity {
                 }
             });
         }
-
-
     }
 
     @Override

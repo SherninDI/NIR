@@ -40,6 +40,7 @@ public class GroupEptFragment extends Fragment {
             Bundle savedInstanceState
     ) {
         binding = FragmentGroupEptBinding.inflate(inflater, container, false);
+        setHasOptionsMenu(false);
         return binding.getRoot();
     }
 
@@ -88,15 +89,15 @@ public class GroupEptFragment extends Fragment {
 
         Log.e(TAG, "group "+ position+" " + bytesToHex(group));
 
-        binding.codes.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Bundle bundle = new Bundle();
-                bundle.putInt("group_position", position);
-                NavHostFragment.findNavController(GroupEptFragment.this)
-                        .navigate(R.id.action_GroupEptFragment_to_CodesFragment, bundle);
-            }
-        });
+//        binding.codes.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//                Bundle bundle = new Bundle();
+//                bundle.putInt("group_position", position);
+//                NavHostFragment.findNavController(GroupEptFragment.this)
+//                        .navigate(R.id.action_GroupEptFragment_to_CodesFragment, bundle);
+//            }
+//        });
 
         binding.saveCodeSettings.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -129,7 +130,8 @@ public class GroupEptFragment extends Fragment {
         binding.cancelCodeSettings.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
+                NavHostFragment.findNavController(GroupEptFragment.this)
+                        .navigate(R.id.action_GroupEptFragment_to_GroupDataFragment);
             }
         });
     }

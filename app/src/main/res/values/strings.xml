@@ -19,9 +19,12 @@
     <string name="reset_button">Сбросить</string>
     <string name="add_button">Добавить</string>
     <string name="save_button">Сохранить</string>
+    <string name="save_groups_button">Сохранить воздействия</string>
     <string name="delete_button">Удалить</string>
+    <string name="delete_ept_button">Удалить группу</string>
     <string name="add_ept_button">Добавить воздействие</string>
     <string name="settings_button">Настройки</string>
+    <string name="settings_ept_button">Настройки группы</string>
     <string name="name_hint">Введите название группы</string>
     <string name="time_hint">Введите общее время группы</string>
     <string name="ept_title">Список воздействий</string>

@@ -86,18 +86,18 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintBottom_toBottomOf="parent">
 
-        <Button
-                android:layout_width="0dp"
-                android:layout_height="match_parent"
-                android:id="@+id/codes"
-                android:text="@string/codes"
-                android:layout_columnSpan="2"
-                android:layout_marginEnd="5dp"
-                android:layout_marginStart="5dp"
-                android:layout_marginBottom="25dp"
-                android:layout_gravity="center|fill"
-                android:layout_columnWeight="1"
-                android:background="@drawable/button_background"/>
+<!--        <Button-->
+<!--                android:layout_width="0dp"-->
+<!--                android:layout_height="match_parent"-->
+<!--                android:id="@+id/codes"-->
+<!--                android:text="@string/codes"-->
+<!--                android:layout_columnSpan="2"-->
+<!--                android:layout_marginEnd="5dp"-->
+<!--                android:layout_marginStart="5dp"-->
+<!--                android:layout_marginBottom="25dp"-->
+<!--                android:layout_gravity="center|fill"-->
+<!--                android:layout_columnWeight="1"-->
+<!--                android:background="@drawable/button_background"/>-->
 
         <Button
                 android:layout_width="0dp"

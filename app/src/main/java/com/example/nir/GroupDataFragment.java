@@ -8,10 +8,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
-import android.view.KeyEvent;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
+import android.view.*;
 
 import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
@@ -51,6 +48,7 @@ public class GroupDataFragment extends Fragment {
             Bundle savedInstanceState
     ) {
         binding = FragmentGroupDataBinding.inflate(inflater, container, false);
+        setHasOptionsMenu(true);
         return binding.getRoot();
     }
 
@@ -142,46 +140,12 @@ public class GroupDataFragment extends Fragment {
                             eptAdapter.notifyDataSetChanged();
                         }
                     });
-
-
-
                 }
             });
         }
 
-        binding.addEpt.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Bundle bundle = new Bundle();
-                bundle.putInt("group_position", position);
-                NavHostFragment.findNavController(GroupDataFragment.this)
-                        .navigate(R.id.action_GroupDataFragment_to_GroupEptFragment, bundle);
-            }
-        });
 
-        binding.settings.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Bundle bundle = new Bundle();
-                bundle.putInt("group_position", position);
-                NavHostFragment.findNavController(GroupDataFragment.this)
-                        .navigate(R.id.action_GroupDataFragment_to_GroupSettingsFragment, bundle);
-            }
-        });
 
-        binding.delete.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                try {
-                    fileHandler.deleteBytesFromPosition(position);
-                    Intent intent = new Intent(getActivity(), DataActivity.class);
-                    startActivity(intent);
-                } catch (IOException e) {
-                    throw new RuntimeException(e);
-                }
-
-            }
-        });
         binding.saveChanges.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -196,6 +160,48 @@ public class GroupDataFragment extends Fragment {
                 }
             }
         });
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        int id = item.getItemId();
+        switch(id){
+            case R.id.action_add_ept:
+                add();
+                return true;
+            case R.id.action_settings_ept:
+                settings();
+                return true;
+            case R.id.action_del_ept:
+                deleteGroup();
+                return true;
+        }
+        return super.onOptionsItemSelected(item);
+    }
+
+
+    public void settings() {
+        Bundle bundle = new Bundle();
+        bundle.putInt("group_position", position);
+        NavHostFragment.findNavController(GroupDataFragment.this)
+                .navigate(R.id.action_GroupDataFragment_to_GroupSettingsFragment, bundle);
+    }
+
+    public void add() {
+        Bundle bundle = new Bundle();
+        bundle.putInt("group_position", position);
+        NavHostFragment.findNavController(GroupDataFragment.this)
+                .navigate(R.id.action_GroupDataFragment_to_CodesFragment, bundle);
+    }
+
+    public void deleteGroup() {
+        try {
+            fileHandler.deleteBytesFromPosition(position);
+            Intent intent = new Intent(getActivity(), DataActivity.class);
+            startActivity(intent);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     public String bytesToHex(byte[] byteArray)

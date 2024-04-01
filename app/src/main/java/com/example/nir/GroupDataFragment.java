@@ -19,10 +19,7 @@ import com.example.nir.databinding.FragmentGroupDataBinding;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 
 public class GroupDataFragment extends Fragment {
     private final String TAG = GroupDataFragment.class.getSimpleName();
@@ -101,6 +98,7 @@ public class GroupDataFragment extends Fragment {
         });
         AlertDialog dialog = builderCode.create();
 
+        Collections.sort(ept);
         if (ept.size() != 0) {
             eptAdapter = new EptAdapter(getActivity(), ept);
             eptList.setAdapter(eptAdapter);

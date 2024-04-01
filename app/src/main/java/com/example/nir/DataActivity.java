@@ -15,6 +15,8 @@ import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
@@ -29,12 +31,7 @@ import java.util.concurrent.Executors;
 
 public class DataActivity extends AppCompatActivity {
     private final String TAG = DataActivity.class.getSimpleName();
-    private Button send;
-    private Button receive;
-    private Button add;
-    private Button save;
-    private Button reset;
-    private Button cancel;
+    private Button send, receive, reset;
     private RecyclerView groupList;
     private GroupAdapter groupAdapter;
     private List<String> groups = new ArrayList<>();
@@ -43,7 +40,7 @@ public class DataActivity extends AppCompatActivity {
     private byte[] groupsByte = new byte[51200];
     private byte[] group = new byte[512];
     private int groupSize = 512;
-
+    int counter = 0;
 
     private static final String ACTION_USB_PERMISSION = "com.android.example.USB_PERMISSION";
     private final ExecutorService mExecutor = Executors.newSingleThreadExecutor();
@@ -71,14 +68,15 @@ public class DataActivity extends AppCompatActivity {
     private UsbEndpoint outEndpoint;
     private UsbDeviceConnection usbConnection;
     private InputOutputManager inputOutputManager;
-    CommandFormat commandFormat;
+    private CommandFormat commandFormat;
+
+    private ByteBuffer groupDataBuffer;
     InputOutputManager.Listener listener = new InputOutputManager.Listener() {
         @Override
         public void onNewData(final byte[] data) {
             DataActivity.this.runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
-
                     DataActivity.this.updateReceivedData(data);
                 }
             });
@@ -104,135 +102,39 @@ public class DataActivity extends AppCompatActivity {
         @Override
         public void run() {
             commandsHandler.obtainMessage(Constants.SYS_NOP).sendToTarget();
+            if (counter == groupDataBuffer.array().length) {
+                writeGroups();
+                counter = 0;
+            }
         }
     };
 
-    ByteBuffer groupDataBuffer;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_data);
 
+        send = findViewById(R.id.send);
+        receive = findViewById(R.id.receive);
+        reset = findViewById(R.id.reset);
+        groupList = findViewById(R.id.group_list);
+
+        commandReset();
+
+        file = new File(this.getFilesDir(), "groups.grf");
+        fileHandler = new FileHandler(file);
         byte[] groupData = new byte[51200];
         groupDataBuffer = ByteBuffer.wrap(groupData);
 
         commandFormat = new CommandFormat();
 
-        send = findViewById(R.id.send);
-        receive = findViewById(R.id.receive);
-        add = findViewById(R.id.add);
-        save = findViewById(R.id.save);
-        reset = findViewById(R.id.reset);
-        cancel = findViewById(R.id.cancel);
+        refreshGroups();
 
-        groupList = findViewById(R.id.group_list);
-
-
-        file = new File(this.getFilesDir(), "groups.grf");
-        fileHandler = new FileHandler(file);
-        showGroups();
-
-        if (groups.size() != 0) {
-            groupAdapter = new GroupAdapter(getApplicationContext(), groups);
-            groupList.setAdapter(groupAdapter);
-            groupAdapter.notifyDataSetChanged();
-            groupAdapter.setOnGroupClickListener(new GroupAdapter.GroupClickListener() {
-                @Override
-                public void onGroupClick(int position, View itemView) {
-                    TextView textView = (TextView) itemView.findViewById(R.id.tvGroupName) ;
-                    Intent intent = new Intent(DataActivity.this, GroupDataActivity.class);
-                    intent.putExtra("group_position", position);
-//                    intent.putExtra("new", false);
-//                    intent.putExtra("name", textView.getText().toString());
-                    startActivity(intent);
-
-                    Log.e(TAG,"click group pos " + position);
-                }
-            });
-        }
-
-
-        add.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent intent = new Intent(DataActivity.this, GroupDataActivity.class);
-//                intent.putExtra("new", true);
-                intent.putExtra("group_position", groups.size());
-                startActivity(intent);
-                Log.e(TAG, "add group pos " + String.valueOf(groups.size()));
-            }
-        });
-
-        save.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                try {
-                    fileHandler.writeBytesToPosition(groupData, 0);
-                } catch (IOException e) {
-                    throw new RuntimeException(e);
-                }
-//                groups.clear();
-                showGroups();
-
-                if (groupAdapter == null) {
-                    groupAdapter = new GroupAdapter(getApplicationContext(), groups);
-                    groupList.setAdapter(groupAdapter);
-                    groupAdapter.notifyDataSetChanged();
-
-                    groupAdapter.setOnGroupClickListener(new GroupAdapter.GroupClickListener() {
-                        @Override
-                        public void onGroupClick(int position, View itemView) {
-                            TextView textView = (TextView) itemView.findViewById(R.id.tvGroupName) ;
-                            Intent intent = new Intent(DataActivity.this, GroupDataActivity.class);
-                            intent.putExtra("group_position", position);
-                            startActivity(intent);
-
-                            Log.e(TAG,"click group pos " + position);
-                        }
-                    });
-                }
-
-
-
-            }
-        });
-
-        send.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                commandsHandler.obtainMessage(Constants.SYS_PUT, groupsByte.length,-1, groupsByte).sendToTarget();
-                Toast.makeText(getApplicationContext(), "Данные отправлены", Toast.LENGTH_SHORT).show();
-            }
-        });
-
-        receive.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                groupList.setAdapter(null);
-                commandsHandler.obtainMessage(Constants.SYS_GET).sendToTarget();
-                Toast.makeText(getApplicationContext(), "Данные получены", Toast.LENGTH_SHORT).show();
-            }
-        });
-
-
-        reset.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-
-                commandsHandler.obtainMessage(Constants.SYS_RESET).sendToTarget();
-                Toast.makeText(getApplicationContext(), "Аппарат готов к управлению", Toast.LENGTH_SHORT).show();
-            }
-        });
-
-        cancel.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                commandsHandler.obtainMessage(Constants.SYS_CANCEL).sendToTarget();
-                Toast.makeText(getApplicationContext(), "Отмена", Toast.LENGTH_SHORT).show();
-            }
-        });
-
+        send.setOnClickListener(v -> commandSend());
+        receive.setOnClickListener(v -> commandReceive());
+        reset.setOnClickListener(v -> commandReset());
 
         usbManager = (UsbManager) getSystemService(Context.USB_SERVICE);
         UsbDevice usbDevice = findDevice();
@@ -274,10 +176,33 @@ public class DataActivity extends AppCompatActivity {
                 }
             }
         }
-
     }
 
-    private void showGroups() {
+    public void commandReset() {
+        commandsHandler.obtainMessage(Constants.SYS_RESET).sendToTarget();
+        Toast.makeText(getApplicationContext(), "Аппарат готов к управлению", Toast.LENGTH_SHORT).show();
+    }
+
+    public void commandCancel() {
+        commandsHandler.obtainMessage(Constants.SYS_CANCEL).sendToTarget();
+        Toast.makeText(getApplicationContext(), "Отмена", Toast.LENGTH_SHORT).show();
+    }
+
+    public void commandReceive() {
+        commandsHandler.obtainMessage(Constants.SYS_GET).sendToTarget();
+    }
+
+    public void commandSend() {
+        commandsHandler.obtainMessage(Constants.SYS_PUT, groupsByte.length,-1, groupsByte).sendToTarget();
+        Toast.makeText(getApplicationContext(), "Данные отправлены", Toast.LENGTH_SHORT).show();
+    }
+
+    public void refreshGroups() {
+        readGroups();
+        showGroups();
+    }
+
+    public void readGroups() {
         try {
             groupsByte = fileHandler.readBytes(51200);
             for (int i = 0; i < groupsByte.length / groupSize; i++) {
@@ -291,7 +216,64 @@ public class DataActivity extends AppCompatActivity {
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
 
+    public void writeGroups() {
+        try {
+            fileHandler.writeBytesToPosition(groupDataBuffer.array(), 0);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public void showGroups() {
+        if (groups.size() != 0) {
+            groupAdapter = new GroupAdapter(getApplicationContext(), groups);
+            groupList.setAdapter(groupAdapter);
+            groupAdapter.notifyDataSetChanged();
+            groupAdapter.setOnGroupClickListener(new GroupAdapter.GroupClickListener() {
+                @Override
+                public void onGroupClick(int position, View itemView) {
+                    TextView textView = (TextView) itemView.findViewById(R.id.tvGroupName) ;
+                    Intent intent = new Intent(DataActivity.this, GroupDataActivity.class);
+                    intent.putExtra("group_position", position);
+//                    intent.putExtra("new", false);
+//                    intent.putExtra("name", textView.getText().toString());
+                    startActivity(intent);
+
+                    Log.e(TAG,"click group pos " + position);
+                }
+            });
+        }
+
+
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        // Inflate the menu; this adds items to the action bar if it is present.
+        getMenuInflater().inflate(R.menu.data_menu, menu);
+        return true;
+    }
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        int id = item.getItemId();
+        switch(id){
+            case R.id.action_add:
+                Intent intent = new Intent(DataActivity.this, GroupDataActivity.class);
+//                intent.putExtra("new", true);
+                intent.putExtra("group_position", groups.size());
+                startActivity(intent);
+                Log.e(TAG, "add group pos " + String.valueOf(groups.size()));
+                return true;
+            case R.id.action_cancel:
+                commandCancel();
+                return true;
+            case R.id.action_refresh:
+                refreshGroups();
+                return true;
+        }
+        return super.onOptionsItemSelected(item);
     }
 
     private void stopIoManager() {
@@ -346,25 +328,18 @@ public class DataActivity extends AppCompatActivity {
                         Log.i(TAG, "SYS_FILE " + bytesToHex(range));
                         break;
                     case (byte) Constants.SYS_DATA:
-
                         byte[] res = Arrays.copyOfRange(range,2,10);
+                        counter += res.length;
                         groupDataBuffer.put(res);
-                        Log.i(TAG, "SYS_DATA " + bytesToHex(res));
+//                        Log.i(TAG, "SYS_DATA " + bytesToHex(res) + " " + counter);
+//                        Log.i(TAG, String.valueOf(counter));
+                        if (counter == groupDataBuffer.array().length) {
+                            Toast.makeText(getApplicationContext(), R.string.received, Toast.LENGTH_SHORT).show();
+                        }
                         break;
                     default: break;
                 }
-
-
-
         }
-
-
-
-
-        final String message = "Read " + data.length + " bytes: \n"
-                + HexDump.dumpHexString(data) + "\n\n";
-//        Log.d(TAG, message);
-
     }
 
     private void sendMessage(byte[] command) {
@@ -418,7 +393,7 @@ public class DataActivity extends AppCompatActivity {
                     break;
                 case Constants.SYS_CANCEL:
                     command = commandFormat.getCommand(Constants.SYS_CANCEL, data);
-                    inputOutputManager.writeAsync(command);
+                    sendMessage(command);
                     Log.e(TAG, "SYS_CANCEL " + bytesToHex(command));
                     break;
                 case Constants.SYS_DATA:
@@ -430,8 +405,6 @@ public class DataActivity extends AppCompatActivity {
             return false;
         }
     });
-
-
 
     public static String bytesToHex(byte[] byteArray)
     {

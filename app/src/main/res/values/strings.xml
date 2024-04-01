@@ -1,8 +1,9 @@
 <resources>
-    <string name="app_name">НИР</string>
+    <string name="app_name">Диплом</string>
     <string name="data">Группы воздействий</string>
     <string name="connect_button">Подключиться</string>
     <string name="refresh_button">Обновить</string>
+    <string name="refresh_groups_button">Обновить группы</string>
     <string name="waiting">Ожидание устройства…</string>
     <string name="device_found">Устройство обнаружено:\n%1$s</string>
     <string name="device_not_found">Устройство не обнаружено</string>
@@ -53,9 +54,16 @@
     <string name="search_text">Введите название или код</string>
     <string name="ampl">Амплитуда</string>
     <string name="step">Время шага</string>
+    <string name="received">Данные получены! Обновите группы</string>
+
+
+
     <!-- Strings used for fragments for navigation -->
     <string name="next">Next</string>
+
+
     <string name="previous">Previous</string>
+
 
     <string name="hello_first_fragment">Hello first fragment</string>
     <string name="hello_second_fragment">Hello second fragment. Arg: %1$s</string>

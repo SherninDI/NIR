@@ -91,7 +91,8 @@ public class DatabaseAdapter {
                 int value_id = cursor1.getInt(0);
                 int sub_group_id = cursor1.getInt(1);
                 int value = cursor1.getInt(2);
-                ItemEpt itemEpt = new ItemEpt(name, value);
+                String type = cursor1.getString(3);
+                ItemEpt itemEpt = new ItemEpt(name, value, type);
                 ept.add(itemEpt);
             }
             cursor1.close();
@@ -111,7 +112,8 @@ public class DatabaseAdapter {
             Cursor cursor1 = getData(sql1);
             while (cursor1.moveToNext()) {
                 int value = cursor1.getInt(2);
-                ItemEpt itemEpt = new ItemEpt(name, value);
+                String type = cursor1.getString(3);
+                ItemEpt itemEpt = new ItemEpt(name, value, type);
                 ept.add(itemEpt);
             }
             cursor1.close();
@@ -128,13 +130,15 @@ public class DatabaseAdapter {
             int value_id = cursorEPT.getInt(0);
             int sub_group_id = cursorEPT.getInt(1);
             int value = cursorEPT.getInt(2);
+            String type = cursorEPT.getString(3);
             String sqlName = "SELECT * FROM sub_groups WHERE id=" + sub_group_id + ";";
             Cursor cursorName = getData(sqlName);
             while (cursorName.moveToNext()) {
                 int sub_id = cursorName.getInt(0);
                 int group_id = cursorName.getInt(1);
                 String name = cursorName.getString(2);
-                ept = new ItemEpt(name, value);
+
+                ept = new ItemEpt(name, value, type);
             }
         }
         return ept;

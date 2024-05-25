@@ -40,81 +40,90 @@ public class GroupFormat {
 //    }
 
     public void writeFileId() {
-        String fileIdStr = "EG01";
+        String fileIdStr = "EG00";
         byte[] fileIdBytes = fileIdStr.getBytes(Charset.forName("windows-1251"));
         writeBytes(fileIdBytes, 0);
     }
 
-    public void writeTitle(String title) {
-        byte titleLengthByte = (byte)title.length();
-        writeByte(titleLengthByte, 4);
-        byte[] titleBytes = reverseByteArray(title.getBytes(Charset.forName("windows-1251")));
-        writeBytes(titleBytes, 5);
+    public void writeNumber(int num) {
+        writeByte((byte) num, 4);
     }
-
-    public String readTitle() {
-        int length = readByte(4);
-        byte[] title = reverseByteArray(readBytes(length, 5));
-        return new String(title,Charset.forName("windows-1251"));
-    }
-    public int readTitleLength() {
+    public int readNumber() {
         return readByte(4);
     }
 
-
-    public void writeTime(String time) {
-        int timeInt = Integer.parseInt(time);
-        byte[] timeBytes = reverseByteArray(BigInteger.valueOf(timeInt).toByteArray());
-        writeBytes(timeBytes, 20);
+    public void writeStepCount(int stepCount) {
+        writeByte((byte) stepCount, 5);
+    }
+    public int readStepCount() {
+        return readByte(5);
     }
 
+    public void writeTimeString(String time) {
+        int timeInt = Integer.parseInt(time);
+        byte[] timeBytes = reverseByteArray(BigInteger.valueOf(timeInt).toByteArray());
+        writeBytes(timeBytes, 6);
+    }
+    public void writeTimeInt(int time) {
+        byte[] timeBytes = reverseByteArray(BigInteger.valueOf(time).toByteArray());
+        writeBytes(timeBytes, 6);
+    }
     public String readTime() {
-        byte[] time = reverseByteArray(readBytes(2, 20));
+        byte[] time = reverseByteArray(readBytes(2, 6));
         int timeInt = new BigInteger(time).intValue();
         return String.valueOf(timeInt & 0xffff);
     }
 
-    public void writeMode(byte mode) {
-        writeByte(mode, 22);
+    public void writeTitle(String title) {
+        byte titleLengthByte = (byte)title.length();
+        writeByte(titleLengthByte, 8);
+        byte[] titleBytes = reverseByteArray(title.getBytes(Charset.forName("windows-1251")));
+        writeBytes(titleBytes, 9);
+    }
+    public String readTitle() {
+        int length = readByte(8);
+        byte[] title = reverseByteArray(readBytes(length, 9));
+        return new String(title,Charset.forName("windows-1251"));
+    }
+    public int readTitleLength() {
+        return readByte(8);
     }
 
-    public int readMode() {
-        return readByte(22);
-    }
+//    public void writeMode(byte mode) {
+//        writeByte(mode, 22);
+//    }
+//
+//    public int readMode() {
+//        return readByte(22);
+//    }
+//
+//    public void writeSpectre(byte spectre) {
+//        writeByte(spectre, 23);
+//    }
+//
+//    public int readSpectre() {
+//        return readByte(23);
+//    }
+//
+//    public void writeMaxFreq(byte maxFreq) {
+//        writeByte(maxFreq, 24);
+//    }
+//
+//    public int readMaxFreq() {
+//        return readByte(24);
+//    }
 
-    public void writeSpectre(byte spectre) {
-        writeByte(spectre, 23);
-    }
 
-    public int readSpectre() {
-        return readByte(23);
-    }
 
-    public void writeMaxFreq(byte maxFreq) {
-        writeByte(maxFreq, 24);
-    }
-
-    public int readMaxFreq() {
-        return readByte(24);
-    }
-
-    public void writeStepCount(int stepCount) {
-        writeByte((byte) stepCount, 26);
-    }
-
-    public int readStepCount() {
-        return readByte(26);
-    }
-
-    public void writeStep(String type, int code, int ampl, int stepTime, int stepPos) {
-        byte[] typeBytes = type.getBytes(Charset.forName("windows-1251"));
-        writeBytes(typeBytes, 27 + stepPos * 6);
-        byte[] codeBytes = reverseByteArray(BigInteger.valueOf(code).toByteArray());
-        writeBytes(codeBytes, 27 + stepPos * 6 + 1);
+    public void writeStep(ItemEpt ept, int ampl, int stepTime, int stepPos) {
+        byte[] typeBytes = ept.getEptType().getBytes(Charset.forName("windows-1251"));
+        writeBytes(typeBytes, 24 + stepPos * 6);
+        byte[] codeBytes = reverseByteArray(BigInteger.valueOf(ept.getEptValue()).toByteArray());
+        writeBytes(codeBytes, 24 + stepPos * 6 + 1);
         byte[] amplBytes = BigInteger.valueOf(ampl).toByteArray();
-        writeBytes(amplBytes, 27 + stepPos * 6 + 3);
+        writeBytes(amplBytes, 24 + stepPos * 6 + 3);
         byte[] stepTimeBytes = reverseByteArray(BigInteger.valueOf(stepTime).toByteArray());
-        writeBytes(stepTimeBytes, 27 + stepPos * 6 + 4);
+        writeBytes(stepTimeBytes, 24 + stepPos * 6 + 4);
     }
 
     public void writeAmpl(int ampl, int stepPos) {

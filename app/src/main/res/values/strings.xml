@@ -18,7 +18,11 @@
     <string name="cancel_button">Отменить</string>
     <string name="reset_button">Сбросить</string>
     <string name="add_button">Добавить</string>
+
+    <string name="clean_button">Очистить</string>
     <string name="save_button">Сохранить</string>
+    <string name="open_button">Открыть</string>
+
     <string name="save_groups_button">Сохранить воздействия</string>
     <string name="delete_button">Удалить</string>
     <string name="delete_ept_button">Удалить группу</string>

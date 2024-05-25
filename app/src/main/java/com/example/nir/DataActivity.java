@@ -23,6 +23,8 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.util.*;
@@ -42,6 +44,9 @@ public class DataActivity extends AppCompatActivity {
     private int groupSize = 512;
     int counter = 0;
 
+
+    private static final String FILE_NAME = "groups.grf";
+    private static final String SAVE_FILE_NAME = "save.grf";
     private static final String ACTION_USB_PERMISSION = "com.android.example.USB_PERMISSION";
     private final ExecutorService mExecutor = Executors.newSingleThreadExecutor();
     private final BroadcastReceiver usbReceiver = new BroadcastReceiver() {
@@ -102,10 +107,10 @@ public class DataActivity extends AppCompatActivity {
         @Override
         public void run() {
             commandsHandler.obtainMessage(Constants.SYS_NOP).sendToTarget();
-            if (counter == groupDataBuffer.array().length) {
-                writeGroups();
-                counter = 0;
-            }
+//            if (counter == groupDataBuffer.array().length) {
+////                writeGroups();
+//                counter = 0;
+//            }
         }
     };
 
@@ -130,7 +135,7 @@ public class DataActivity extends AppCompatActivity {
 
         commandFormat = new CommandFormat();
 
-        refreshGroups();
+//        refreshGroups();
 
         send.setOnClickListener(v -> commandSend());
         receive.setOnClickListener(v -> commandReceive());
@@ -193,59 +198,145 @@ public class DataActivity extends AppCompatActivity {
     }
 
     public void commandSend() {
-        commandsHandler.obtainMessage(Constants.SYS_PUT, groupsByte.length,-1, groupsByte).sendToTarget();
-        Toast.makeText(getApplicationContext(), "Данные отправлены", Toast.LENGTH_SHORT).show();
-    }
-
-    public void refreshGroups() {
-        readGroups();
-        showGroups();
-    }
-
-    public void readGroups() {
         try {
-            groupsByte = fileHandler.readBytes(51200);
+            File file = new File(this.getFilesDir(), FILE_NAME);
+            FileHandler fileHandler = new FileHandler(file);
+            byte[] groupsBytes = fileHandler.readBytes(51200);
+            commandsHandler.obtainMessage(Constants.SYS_PUT, groupsByte.length,-1, groupsBytes).sendToTarget();
+            Toast.makeText(getApplicationContext(), "Данные отправлены", Toast.LENGTH_SHORT).show();
+            fileHandler.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+    }
+
+    public void cleanGroups() {
+        try {
+            File file = new File(this.getFilesDir(), FILE_NAME);
+            FileHandler fileHandler = new FileHandler(file);
             for (int i = 0; i < groupsByte.length / groupSize; i++) {
                 group = fileHandler.readBytesFromPosition(i);
                 GroupFormat groupFormat = new GroupFormat(group);
+                groupFormat.writeNumber(i);
+                groupFormat.writeFileId();
+//                groupFormat.writeTitle("Группа " + (i + 1));
+                groupFormat.writeCRC();
+                fileHandler.writeBytesToPosition(group, i);
                 if (groupFormat.readTitleLength() != 0) {
                     groups.add(groupFormat.readTitle());
                 }
-//                Log.i(TAG, i + " " + bytesToHex(group));
             }
+            fileHandler.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        groupAdapter = new GroupAdapter(getApplicationContext(), groups);
+        groupList.setAdapter(groupAdapter);
+        groupAdapter.notifyDataSetChanged();
+    }
+
+    public void saveGroups() {
+        try {
+            File file = new File(this.getFilesDir(), FILE_NAME);
+            FileHandler fileHandler = new FileHandler(file);
+            groupsByte = fileHandler.readBytes(51200);
+            File saveFile = new File(this.getFilesDir(), SAVE_FILE_NAME);
+            try(FileOutputStream fos = new FileOutputStream(saveFile)) {
+                fos.write(groupsByte);
+                Toast.makeText(this, "Файл сохранен", Toast.LENGTH_SHORT).show();
+            }
+            catch(IOException ex) {
+                Toast.makeText(this, ex.getMessage(), Toast.LENGTH_SHORT).show();
+            }
+            fileHandler.close();
+
         } catch (IOException e) {
             e.printStackTrace();
         }
     }
 
-    public void writeGroups() {
-        try {
-            fileHandler.writeBytesToPosition(groupDataBuffer.array(), 0);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-    public void showGroups() {
-        if (groups.size() != 0) {
-            groupAdapter = new GroupAdapter(getApplicationContext(), groups);
-            groupList.setAdapter(groupAdapter);
-            groupAdapter.notifyDataSetChanged();
-            groupAdapter.setOnGroupClickListener(new GroupAdapter.GroupClickListener() {
-                @Override
-                public void onGroupClick(int position, View itemView) {
-                    TextView textView = (TextView) itemView.findViewById(R.id.tvGroupName) ;
-                    Intent intent = new Intent(DataActivity.this, GroupDataActivity.class);
-                    intent.putExtra("group_position", position);
-//                    intent.putExtra("new", false);
-//                    intent.putExtra("name", textView.getText().toString());
-                    startActivity(intent);
-
-                    Log.e(TAG,"click group pos " + position);
+    public void openGroups() {
+        File saveFile = new File(this.getFilesDir(), SAVE_FILE_NAME);
+        // если файл не существует, выход из метода
+        if(!saveFile.exists()) return;
+        try(FileInputStream fin =  new FileInputStream(saveFile)) {
+            byte[] bytes = new byte[fin.available()];
+            fin.read(bytes);
+            File file = new File(this.getFilesDir(), FILE_NAME);
+            FileHandler fileHandler = new FileHandler(file);
+            fileHandler.writeBytes(bytes);
+            for (int i = 0; i < bytes.length / groupSize; i++) {
+                group = fileHandler.readBytesFromPosition(i);
+                GroupFormat groupFormat = new GroupFormat(group);
+                if (groupFormat.readTitleLength() != 0) {
+                    groups.add(groupFormat.readTitle());
                 }
-            });
+            }
+            fileHandler.close();
+
         }
+        catch(IOException ex) {
+
+            Toast.makeText(this, ex.getMessage(), Toast.LENGTH_SHORT).show();
+        }
+        groupAdapter = new GroupAdapter(getApplicationContext(), groups);
+        groupList.setAdapter(groupAdapter);
+        groupAdapter.notifyDataSetChanged();
     }
+//    public void refreshGroups() {
+//        readGroups();
+//        showGroups();
+//    }
+//
+
+
+
+//    public void readGroups() {
+//        try {
+//            groupsByte = fileHandler.readBytes(51200);
+//            for (int i = 0; i < groupsByte.length / groupSize; i++) {
+//                group = fileHandler.readBytesFromPosition(i);
+//                GroupFormat groupFormat = new GroupFormat(group);
+//                if (groupFormat.readTitleLength() != 0) {
+//                    groups.add(groupFormat.readTitle());
+//                }
+////                Log.i(TAG, i + " " + bytesToHex(group));
+//            }
+//        } catch (IOException e) {
+//            e.printStackTrace();
+//        }
+//    }
+//
+//    public void writeGroups() {
+//        try {
+//            fileHandler.writeBytesToPosition(groupDataBuffer.array(), 0);
+//        } catch (IOException e) {
+//            throw new RuntimeException(e);
+//        }
+//    }
+//
+//    public void showGroups() {
+//        if (groups.size() != 0) {
+//            groupAdapter = new GroupAdapter(getApplicationContext(), groups);
+//            groupList.setAdapter(groupAdapter);
+//            groupAdapter.notifyDataSetChanged();
+//            groupAdapter.setOnGroupClickListener(new GroupAdapter.GroupClickListener() {
+//                @Override
+//                public void onGroupClick(int position, View itemView) {
+//                    TextView textView = (TextView) itemView.findViewById(R.id.tvGroupName) ;
+//                    Intent intent = new Intent(DataActivity.this, GroupDataActivity.class);
+//                    intent.putExtra("group_position", position);
+////                    intent.putExtra("new", false);
+////                    intent.putExtra("name", textView.getText().toString());
+//                    startActivity(intent);
+//
+//                    Log.e(TAG,"click group pos " + position);
+//                }
+//            });
+//        }
+//    }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -256,20 +347,30 @@ public class DataActivity extends AppCompatActivity {
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
-        switch(id){
-            case R.id.action_add:
-                Intent intent = new Intent(DataActivity.this, GroupDataActivity.class);
-//                intent.putExtra("new", true);
-                intent.putExtra("group_position", groups.size());
-                startActivity(intent);
-                Log.e(TAG, "add group pos " + String.valueOf(groups.size()));
+        switch(id) {
+            case R.id.action_clean:
+                cleanGroups();
                 return true;
-            case R.id.action_cancel:
-                commandCancel();
+            case R.id.action_open:
+                openGroups();
                 return true;
-            case R.id.action_refresh:
-                refreshGroups();
+            case R.id.action_save:
+                saveGroups();
                 return true;
+
+//            case R.id.action_add:
+//                Intent intent = new Intent(DataActivity.this, GroupDataActivity.class);
+////                intent.putExtra("new", true);
+//                intent.putExtra("group_position", groups.size());
+//                startActivity(intent);
+//                Log.e(TAG, "add group pos " + String.valueOf(groups.size()));
+//                return true;
+//            case R.id.action_cancel:
+//                commandCancel();
+//                return true;
+//            case R.id.action_refresh:
+//                refreshGroups();
+//                return true;
         }
         return super.onOptionsItemSelected(item);
     }

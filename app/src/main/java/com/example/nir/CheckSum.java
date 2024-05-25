@@ -38,7 +38,6 @@ public class CheckSum {
                     0x21B4F4B5, 0x56B3C423, 0xCFBA9599, 0xB8BDA50F,
                     0x2802B89E, 0x5F058808, 0xC60CD9B2, 0xB10BE924,
                     0x2F6F7C87, 0x58684C11, 0xC1611DAB, 0xB6662D3D,
-
                     0x76DC4190, 0x01DB7106, 0x98D220BC, 0xEFD5102A,
                     0x71B18589, 0x06B6B51F, 0x9FBFE4A5, 0xE8B8D433,
                     0x7807C9A2, 0x0F00F934, 0x9609A88E, 0xE10E9818,
@@ -55,7 +54,6 @@ public class CheckSum {
                     0x5768B525, 0x206F85B3, 0xB966D409, 0xCE61E49F,
                     0x5EDEF90E, 0x29D9C998, 0xB0D09822, 0xC7D7A8B4,
                     0x59B33D17, 0x2EB40D81, 0xB7BD5C3B, 0xC0BA6CAD,
-
                     0xEDB88320, 0x9ABFB3B6, 0x03B6E20C, 0x74B1D29A,
                     0xEAD54739, 0x9DD277AF, 0x04DB2615, 0x73DC1683,
                     0xE3630B12, 0x94643B84, 0x0D6D6A3E, 0x7A6A5AA8,
@@ -72,7 +70,6 @@ public class CheckSum {
                     0xCC0C7795, 0xBB0B4703, 0x220216B9, 0x5505262F,
                     0xC5BA3BBE, 0xB2BD0B28, 0x2BB45A92, 0x5CB36A04,
                     0xC2D7FFA7, 0xB5D0CF31, 0x2CD99E8B, 0x5BDEAE1D,
-
                     0x9B64C2B0, 0xEC63F226, 0x756AA39C, 0x026D930A,
                     0x9C0906A9, 0xEB0E363F, 0x72076785, 0x05005713,
                     0x95BF4A82, 0xE2B87A14, 0x7BB12BAE, 0x0CB61B38,
@@ -89,6 +86,7 @@ public class CheckSum {
                     0xBAD03605, 0xCDD70693, 0x54DE5729, 0x23D967BF,
                     0xB3667A2E, 0xC4614AB8, 0x5D681B02, 0x2A6F2B94,
                     0xB40BBE37, 0xC30C8EA1, 0x5A05DF1B, 0x2D02EF8D
+
             };
 
     public byte CRC8sum(byte[] buffer, int len) {

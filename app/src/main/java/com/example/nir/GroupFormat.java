@@ -77,12 +77,12 @@ public class GroupFormat {
     public void writeTitle(String title) {
         byte titleLengthByte = (byte)title.length();
         writeByte(titleLengthByte, 8);
-        byte[] titleBytes = reverseByteArray(title.getBytes(Charset.forName("windows-1251")));
+        byte[] titleBytes = title.getBytes(Charset.forName("windows-1251"));
         writeBytes(titleBytes, 9);
     }
     public String readTitle() {
         int length = readByte(8);
-        byte[] title = reverseByteArray(readBytes(length, 9));
+        byte[] title = readBytes(length, 9);
         return new String(title,Charset.forName("windows-1251"));
     }
     public int readTitleLength() {
@@ -128,30 +128,30 @@ public class GroupFormat {
 
     public void writeAmpl(int ampl, int stepPos) {
         byte[] amplBytes = BigInteger.valueOf(ampl).toByteArray();
-        writeBytes(amplBytes, 27 + stepPos * 6 + 3);
+        writeBytes(amplBytes, 24 + stepPos * 6 + 3);
 
     }
     public int readAmpl(int stepPos) {
-        byte[] amplBytes = readBytes(1,27 + stepPos * 6 + 3);
+        byte[] amplBytes = readBytes(1,24 + stepPos * 6 + 3);
         return new BigInteger(amplBytes).intValue();
     }
 
     public void writeStepTime(int stepTime, int stepPos) {
         byte[] stepTimeBytes = reverseByteArray(BigInteger.valueOf(stepTime).toByteArray());
-        writeBytes(stepTimeBytes, 27 + stepPos * 6 + 4);
+        writeBytes(stepTimeBytes, 24 + stepPos * 6 + 4);
     }
 
     public int readStepTime(int stepPos) {
-        byte[] stepTimeBytes =  reverseByteArray(readBytes(2,27 + stepPos * 6 + 4));
+        byte[] stepTimeBytes =  reverseByteArray(readBytes(2,24 + stepPos * 6 + 4));
         return new BigInteger(stepTimeBytes).intValue();
     }
 
     public byte[] readStep(int stepPos) {
-        return readBytes(6,27 + stepPos * 6);
+        return readBytes(6,24 + stepPos * 6);
     }
 
     public int readValue(int stepPos) {
-        byte[] codeBytes = reverseByteArray(readBytes(2, 27 + stepPos * 6 + 1));
+        byte[] codeBytes = reverseByteArray(readBytes(2, 24 + stepPos * 6 + 1));
         return new BigInteger(codeBytes).intValue();
     }
 
@@ -187,9 +187,9 @@ public class GroupFormat {
     }
 
     public void writeCRC() {
-        byte[] crc32Byte = readBytes(503,4);
+        byte[] crc32Byte = readBytes(500,4);
         int crc32 = checkSum.CRC32sum(crc32Byte);
-        writeBytes(reverseByteArray(BigInteger.valueOf(crc32).toByteArray()),507);
+        writeBytes(reverseByteArray(BigInteger.valueOf(crc32).toByteArray()),504);
     }
 
 

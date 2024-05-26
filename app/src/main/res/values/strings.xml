@@ -3,7 +3,7 @@
     <string name="data">Группы воздействий</string>
     <string name="connect_button">Подключиться</string>
     <string name="refresh_button">Обновить</string>
-    <string name="refresh_groups_button">Обновить группы</string>
+
     <string name="waiting">Ожидание устройства…</string>
     <string name="device_found">Устройство обнаружено:\n%1$s</string>
     <string name="device_not_found">Устройство не обнаружено</string>
@@ -17,11 +17,12 @@
     <string name="receive_button">Получить</string>
     <string name="cancel_button">Отменить</string>
     <string name="reset_button">Сбросить</string>
-    <string name="add_button">Добавить</string>
 
-    <string name="clean_button">Очистить</string>
-    <string name="save_button">Сохранить</string>
-    <string name="open_button">Открыть</string>
+    <string name="add_button">Добавить группу</string>
+    <string name="refresh_groups_button">Обновить группы</string
+    <string name="clean_button">Очистить группы</string>
+    <string name="save_button">Сохранить группы в файл</string>
+    <string name="open_button">Открыть группы из файла</string>
 
     <string name="save_groups_button">Сохранить воздействия</string>
     <string name="delete_button">Удалить</string>

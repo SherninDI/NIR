@@ -133,10 +133,8 @@ public class DataActivity extends AppCompatActivity {
 
         commandFormat = new CommandFormat();
 
-        openGroups();
-
-
         if (groups.size() != 0) {
+            openGroups();
             groupAdapter = new GroupAdapter(getApplicationContext(), groups);
             groupList.setAdapter(groupAdapter);
             groupAdapter.notifyDataSetChanged();
@@ -242,14 +240,12 @@ public class DataActivity extends AppCompatActivity {
                 groupFormat.writeFileId();
                 groupFormat.writeCRC();
                 fileHandler.writeBytesToPosition(group, i);
-
             }
             groups.clear();
             fileHandler.close();
         } catch (IOException e) {
             e.printStackTrace();
         }
-
         groupAdapter = new GroupAdapter(getApplicationContext(), groups);
         groupList.setAdapter(groupAdapter);
         groupAdapter.notifyDataSetChanged();
@@ -389,16 +385,13 @@ public class DataActivity extends AppCompatActivity {
                 saveGroups();
                 openGroups();
                 return true;
-
-
-
-//            case R.id.action_add:
-//                Intent intent = new Intent(DataActivity.this, GroupDataActivity.class);
-////                intent.putExtra("new", true);
-//                intent.putExtra("group_position", groups.size());
-//                startActivity(intent);
-//                Log.e(TAG, "add group pos " + String.valueOf(groups.size()));
-//                return true;
+            case R.id.action_add:
+                Intent intent = new Intent(DataActivity.this, GroupDataActivity.class);
+//                intent.putExtra("new", true);
+                intent.putExtra("group_position", groups.size());
+                startActivity(intent);
+                Log.e(TAG, "add group pos " + String.valueOf(groups.size()));
+                return true;
 //            case R.id.action_cancel:
 //                commandCancel();
 //                return true;

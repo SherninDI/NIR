@@ -37,8 +37,6 @@ public class DataActivity extends AppCompatActivity {
     private RecyclerView groupList;
     private GroupAdapter groupAdapter;
     private List<String> groups = new ArrayList<>();
-    private File file;
-    private FileHandler fileHandler;
     private byte[] groupsByte = new byte[51200];
     private byte[] group = new byte[512];
     private int groupSize = 512;
@@ -107,10 +105,10 @@ public class DataActivity extends AppCompatActivity {
         @Override
         public void run() {
             commandsHandler.obtainMessage(Constants.SYS_NOP).sendToTarget();
-//            if (counter == groupDataBuffer.array().length) {
-////                writeGroups();
-//                counter = 0;
-//            }
+            if (counter == groupDataBuffer.array().length) {
+                writeGroups();
+                counter = 0;
+            }
         }
     };
 
@@ -128,14 +126,36 @@ public class DataActivity extends AppCompatActivity {
 
         commandReset();
 
-        file = new File(this.getFilesDir(), "groups.grf");
-        fileHandler = new FileHandler(file);
+//        file = new File(this.getFilesDir(), "groups.grf");
+//        fileHandler = new FileHandler(file);
         byte[] groupData = new byte[51200];
         groupDataBuffer = ByteBuffer.wrap(groupData);
 
         commandFormat = new CommandFormat();
 
-//        refreshGroups();
+        openGroups();
+
+
+        if (groups.size() != 0) {
+            groupAdapter = new GroupAdapter(getApplicationContext(), groups);
+            groupList.setAdapter(groupAdapter);
+            groupAdapter.notifyDataSetChanged();
+            groupAdapter.setOnGroupClickListener(new GroupAdapter.GroupClickListener() {
+                @Override
+                public void onGroupClick(int position, View itemView) {
+                    TextView textView = (TextView) itemView.findViewById(R.id.tvGroupName) ;
+                    Intent intent = new Intent(DataActivity.this, GroupDataActivity.class);
+                    intent.putExtra("group_position", position);
+//                    intent.putExtra("new", false);
+//                    intent.putExtra("name", textView.getText().toString());
+                    startActivity(intent);
+
+                    Log.e(TAG,"click group pos " + position);
+                }
+            });
+        } else {
+
+        }
 
         send.setOnClickListener(v -> commandSend());
         receive.setOnClickListener(v -> commandReceive());
@@ -216,17 +236,15 @@ public class DataActivity extends AppCompatActivity {
             File file = new File(this.getFilesDir(), FILE_NAME);
             FileHandler fileHandler = new FileHandler(file);
             for (int i = 0; i < groupsByte.length / groupSize; i++) {
-                group = fileHandler.readBytesFromPosition(i);
+                byte[] group = new byte[groupSize];
                 GroupFormat groupFormat = new GroupFormat(group);
                 groupFormat.writeNumber(i);
                 groupFormat.writeFileId();
-//                groupFormat.writeTitle("Группа " + (i + 1));
                 groupFormat.writeCRC();
                 fileHandler.writeBytesToPosition(group, i);
-                if (groupFormat.readTitleLength() != 0) {
-                    groups.add(groupFormat.readTitle());
-                }
+
             }
+            groups.clear();
             fileHandler.close();
         } catch (IOException e) {
             e.printStackTrace();
@@ -241,11 +259,10 @@ public class DataActivity extends AppCompatActivity {
         try {
             File file = new File(this.getFilesDir(), FILE_NAME);
             FileHandler fileHandler = new FileHandler(file);
-            groupsByte = fileHandler.readBytes(51200);
+            byte[] groupsBytes = fileHandler.readBytes(51200);
             File saveFile = new File(this.getFilesDir(), SAVE_FILE_NAME);
             try(FileOutputStream fos = new FileOutputStream(saveFile)) {
-                fos.write(groupsByte);
-                Toast.makeText(this, "Файл сохранен", Toast.LENGTH_SHORT).show();
+                fos.write(groupsBytes);
             }
             catch(IOException ex) {
                 Toast.makeText(this, ex.getMessage(), Toast.LENGTH_SHORT).show();
@@ -258,6 +275,7 @@ public class DataActivity extends AppCompatActivity {
     }
 
     public void openGroups() {
+        groups.clear();
         File saveFile = new File(this.getFilesDir(), SAVE_FILE_NAME);
         // если файл не существует, выход из метода
         if(!saveFile.exists()) return;
@@ -271,7 +289,9 @@ public class DataActivity extends AppCompatActivity {
                 group = fileHandler.readBytesFromPosition(i);
                 GroupFormat groupFormat = new GroupFormat(group);
                 if (groupFormat.readTitleLength() != 0) {
-                    groups.add(groupFormat.readTitle());
+                    String title = groupFormat.readTitle() +
+                            " " + "(" + groupFormat.readStepCount() + ")";
+                    groups.add(title);
                 }
             }
             fileHandler.close();
@@ -309,13 +329,17 @@ public class DataActivity extends AppCompatActivity {
 //        }
 //    }
 //
-//    public void writeGroups() {
-//        try {
-//            fileHandler.writeBytesToPosition(groupDataBuffer.array(), 0);
-//        } catch (IOException e) {
-//            throw new RuntimeException(e);
-//        }
-//    }
+    public void writeGroups() {
+        try {
+            File file = new File(this.getFilesDir(), FILE_NAME);
+            FileHandler fileHandler = new FileHandler(file);
+            fileHandler.writeBytesToPosition(groupDataBuffer.array(), 0);
+            fileHandler.close();
+            groupDataBuffer.clear();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
 //
 //    public void showGroups() {
 //        if (groups.size() != 0) {
@@ -349,14 +373,24 @@ public class DataActivity extends AppCompatActivity {
         int id = item.getItemId();
         switch(id) {
             case R.id.action_clean:
+                Toast.makeText(this, "Группы очищены", Toast.LENGTH_SHORT).show();
                 cleanGroups();
                 return true;
             case R.id.action_open:
+                Toast.makeText(this, "Файл открыт", Toast.LENGTH_SHORT).show();
                 openGroups();
                 return true;
             case R.id.action_save:
+                Toast.makeText(this, "Файл сохранен", Toast.LENGTH_SHORT).show();
                 saveGroups();
                 return true;
+            case R.id.action_refresh:
+                Toast.makeText(this, "Группы обновлены", Toast.LENGTH_SHORT).show();
+                saveGroups();
+                openGroups();
+                return true;
+
+
 
 //            case R.id.action_add:
 //                Intent intent = new Intent(DataActivity.this, GroupDataActivity.class);

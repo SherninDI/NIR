@@ -23,8 +23,8 @@
     <string name="tab1_label">Название группы</string>
     <string name="tab2">Список</string>
     <string name="tab2_label">Список воздействий</string>
-    <string name="tab3_label">Новое воздействие</string>
     <string name="tab3">Добавить</string>
+    <string name="tab3_label">Новое воздействие</string>
 
     <string name="group_name_text">Название группы № %1$d</string>
     <string name="group_time_text">Время выполнения группы: %1$s</string>
@@ -32,9 +32,16 @@
     <string name="refresh_groups_button">Обновить группы</string>
     <string name="clean_button">Очистить группы</string>
     <string name="save_button">Сохранить группы в файл</string>
+    <string name="save_new_ept_button">Добавить</string>
     <string name="open_button">Открыть группы из файла</string>
 
+    <string name="col_num">№</string>
+    <string name="col_val">Код</string>
+    <string name="col_ampl">Ампл.</string>
+    <string name="col_time">Время</string>
+
     <string name="save_groups_button">Сохранить воздействия</string>
+    <string name="save_group_button">Сохранить группу</string>
     <string name="save_name_button">Сохранить название</string>
     <string name="delete_button">Удалить</string>
     <string name="delete_ept_button">Удалить группу</string>
@@ -66,7 +73,7 @@
     <string name="freq_15000">15000 Гц</string>
 
     <string name="ampl_hint">Введите амплитуду</string>
-    <string name="step_time_hint">Введите время шага 0–65535</string>
+    <string name="step_time_hint">Введите время шага 0–5999</string>
     <string name="code_hint">Выберите код из справочника</string>
     <string name="type_text">Тип записи</string>
     <string name="codes">Справочник</string>

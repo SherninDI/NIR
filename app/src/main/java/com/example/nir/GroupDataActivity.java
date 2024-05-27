@@ -8,8 +8,10 @@ import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
+import android.widget.Toast;
 import androidx.navigation.NavArgument;
 import androidx.navigation.NavController;
 import androidx.navigation.NavDestination;
@@ -21,9 +23,9 @@ import com.example.nir.databinding.ActivityGroupDataBinding;
 
 public class GroupDataActivity extends AppCompatActivity  {
 
-
-
     private final String TAG =  GroupDataActivity.class.getSimpleName();
+
+    private final String POSITION = "group_position";
     private AppBarConfiguration appBarConfiguration;
     private ActivityGroupDataBinding binding;
 
@@ -36,51 +38,27 @@ public class GroupDataActivity extends AppCompatActivity  {
         setContentView(binding.getRoot());
         BottomNavigationView bottomNavigationView = findViewById(R.id.bottom_navigation_view);
 
-//        Button button = findViewById(R.id.cancel_settings);
-//
-//        button.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//                Log.d(TAG, "cancel");
-//            }
-//        });
-
         setSupportActionBar(binding.toolbar);
         NavController navController = Navigation.findNavController(this, R.id.nav_host_fragment_content_group_data);
         NavHostFragment navHostFragment = (NavHostFragment) getSupportFragmentManager().findFragmentById(R.id.nav_host_fragment_content_group_data);
         NavigationUI.setupWithNavController(bottomNavigationView, navHostFragment.getNavController());
         navController.addOnDestinationChangedListener((controller, destination, arguments) -> {
             Bundle bundle = getIntent().getExtras();
-            position = bundle.getInt("group_position");
-            if (bundle != null) {
-                if (destination.getLabel().equals("Название группы")) {
-                    NavArgument argument = new NavArgument.Builder().setDefaultValue(position).build();
-                    destination.addArgument("group_position", argument);
-                    return;
-                } else if (destination.getLabel().equals("Список воздействий")) {
-                    NavArgument argument = new NavArgument.Builder().setDefaultValue(position).build();
-                    destination.addArgument("group_position", argument);
-
-                } else if (destination.getLabel().equals("Новое воздействие")) {
-                    NavArgument argument = new NavArgument.Builder().setDefaultValue(position).build();
-                    destination.addArgument("group_position", argument);
-                }
+            position = bundle.getInt(POSITION);
+            if (destination.getLabel().equals("Название группы")) {
+                NavArgument argument = new NavArgument.Builder().setDefaultValue(position).build();
+                destination.addArgument(POSITION, argument);
+            } else if (destination.getLabel().equals("Список воздействий")) {
+                NavArgument argument = new NavArgument.Builder().setDefaultValue(position).build();
+                destination.addArgument(POSITION, argument);
+            } else if (destination.getLabel().equals("Новое воздействие")) {
+                NavArgument argument = new NavArgument.Builder().setDefaultValue(position).build();
+                destination.addArgument(POSITION, argument);
             }
-
-
         });
-
-        Bundle bundle = getIntent().getExtras();
-        if (bundle != null) {
-
-        } else {
-//            setTitle("Новая группа");
-        }
 
         appBarConfiguration = new AppBarConfiguration.Builder(navController.getGraph()).build();
         NavigationUI.setupActionBarWithNavController(this, navController, appBarConfiguration);
-
-
     }
 
     @Override
@@ -95,6 +73,22 @@ public class GroupDataActivity extends AppCompatActivity  {
         NavController navController = Navigation.findNavController(this, R.id.nav_host_fragment_content_group_data);
         return NavigationUI.navigateUp(navController, appBarConfiguration)
                 || super.onSupportNavigateUp();
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        int id = item.getItemId();
+        switch(id){
+            case R.id.action_save_group:
+                Toast.makeText(this, "Группа сохранена", Toast.LENGTH_SHORT).show();
+//                saveGroup();
+                return true;
+            case R.id.action_del_ept:
+                Toast.makeText(this, "Группа удалена", Toast.LENGTH_SHORT).show();
+//                deleteGroup();
+                return true;
+        }
+        return super.onOptionsItemSelected(item);
     }
     
 }

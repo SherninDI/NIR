@@ -1,5 +1,6 @@
 package com.example.nir;
 
+import android.app.Activity;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
@@ -35,6 +36,15 @@ public class GroupEptFragment extends Fragment {
     private FragmentGroupEptBinding binding;
 
     @Override
+    public void onAttach(Activity activity) {
+        super.onAttach(activity);
+        Bundle bundle = activity.getIntent().getExtras();
+        if (bundle != null) {
+            position = bundle.getInt("group_position");
+        }
+    }
+
+    @Override
     public View onCreateView(
             LayoutInflater inflater, ViewGroup container,
             Bundle savedInstanceState
@@ -60,13 +70,7 @@ public class GroupEptFragment extends Fragment {
         TextView codeText = view.findViewById(R.id.text_code);
         EditText codeAmpl = view.findViewById(R.id.text_ampl);
         EditText codeTime = view.findViewById(R.id.text_step_time);
-        Spinner typeSpinner = view.findViewById(R.id.spinner_type);
 
-        List<String> types = new ArrayList<>();
-        types.add("f"); types.add("d"); types.add("m"); types.add("p");
-        ArrayAdapter<String> spinnerTypeAdapter = new ArrayAdapter<>(getContext(),android.R.layout.simple_spinner_item, types);
-        spinnerTypeAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        typeSpinner.setAdapter(spinnerTypeAdapter);
 
         Bundle bundle = getArguments();
         if (bundle != null) {
@@ -127,13 +131,6 @@ public class GroupEptFragment extends Fragment {
 //            }
 //        });
 
-        binding.cancelCodeSettings.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-//                NavHostFragment.findNavController(GroupEptFragment.this)
-//                        .navigate(R.id.action_GroupEptFragment_to_GroupDataFragment);
-            }
-        });
     }
 
     @Override

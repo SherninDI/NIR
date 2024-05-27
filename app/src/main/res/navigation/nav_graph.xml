@@ -11,13 +11,7 @@
             android:label="@string/tab1_label"
             tools:layout="@layout/fragment_group_name">
 
-<!--        <action-->
-<!--                android:id="@+id/action_GroupNameFragment_to_GroupDataFragment"-->
-<!--                app:destination="@id/GroupDataFragment"/>-->
     </fragment>
-
-
-
 
     <fragment
             android:id="@+id/GroupDataFragment"
@@ -25,12 +19,6 @@
             android:label="@string/tab2_label"
             tools:layout="@layout/fragment_group_data">
 
-<!--        <action-->
-<!--                android:id="@+id/action_GroupDataFragment_to_GroupNameFragment"-->
-<!--                app:destination="@id/GroupNameFragment"/>-->
-<!--        <action-->
-<!--                android:id="@+id/action_GroupDataFragment_to_CodesFragment"-->
-<!--                app:destination="@id/CodesFragment"/>-->
     </fragment>
 
     <fragment
@@ -38,14 +26,7 @@
             android:name="com.example.nir.GroupEptFragment"
             android:label="@string/tab3_label"
             tools:layout="@layout/fragment_group_ept">
-
-<!--        <action-->
-<!--                android:id="@+id/action_GroupEptFragment_to_GroupDataFragment"-->
-<!--                app:destination="@id/GroupDataFragment"/>-->
-
-<!--        <action-->
-<!--                android:id="@+id/action_GroupEptFragment_to_CodesFragment"-->
-<!--                app:destination="@id/CodesFragment"/>-->
+        />
     </fragment>
 
 
@@ -55,12 +36,7 @@
             android:label="@string/tab3_label"
             tools:layout="@layout/fragment_codes">
 
-<!--        <action-->
-<!--                android:id="@+id/action_CodesFragment_to_GroupEptFragment"-->
-<!--                app:destination="@id/GroupEptFragment"/>-->
-<!--        <action-->
-<!--                android:id="@+id/action_CodesFragment_to_GroupDataFragment"-->
-<!--                app:destination="@id/GroupDataFragment"/>-->
+        <action android:id="@+id/action_CodesFragment_to_GroupEptFragment" app:destination="@id/GroupEptFragment"/>
     </fragment>
 
 

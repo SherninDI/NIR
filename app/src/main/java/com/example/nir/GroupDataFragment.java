@@ -105,10 +105,25 @@ public class GroupDataFragment extends Fragment {
         }
 
         GroupFormat groupFormat = new GroupFormat(group);
+
+
+
+
         for (int i = 0; i < 480 / 6; i++) {
             int stepValue = groupFormat.readValue(i);
+            int stepAmpl = groupFormat.readAmpl(i);
+            int stepTime = groupFormat.readStepTime(i);
             if (stepValue != 0) {
-                ept.add(databaseAdapter.getEptByValue(stepValue));
+                ItemEpt itemEpt = databaseAdapter.getEptByValue(stepValue);
+                ItemEpt newItem = new ItemEpt(
+                        itemEpt.getEptNameText(),
+                        itemEpt.getEptValue(),
+                        itemEpt.getEptType(),
+                        stepAmpl,
+                        stepTime
+                        );
+                ept.add(newItem);
+
             }
         }
 
@@ -173,38 +188,23 @@ public class GroupDataFragment extends Fragment {
 
 
 
-        binding.saveChanges.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                GroupFormat groupFormat = new GroupFormat(group);
-                groupFormat.writeCRC();
-                try {
-                    fileHandler.writeBytesToPosition(group, position);
-                    Intent intent = new Intent(getActivity(), DataActivity.class);
-                    startActivity(intent);
-                } catch (IOException e) {
-                    throw new RuntimeException(e);
-                }
-            }
-        });
+//        binding.saveChanges.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//                GroupFormat groupFormat = new GroupFormat(group);
+//                groupFormat.writeCRC();
+//                try {
+//                    fileHandler.writeBytesToPosition(group, position);
+//                    Intent intent = new Intent(getActivity(), DataActivity.class);
+//                    startActivity(intent);
+//                } catch (IOException e) {
+//                    throw new RuntimeException(e);
+//                }
+//            }
+//        });
     }
 
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        int id = item.getItemId();
-        switch(id){
-//            case R.id.action_add_ept:
-//                add();
-//                return true;
-//            case R.id.action_settings_ept:
-//                settings();
-//                return true;
-//            case R.id.action_del_ept:
-//                deleteGroup();
-//                return true;
-        }
-        return super.onOptionsItemSelected(item);
-    }
+
 
 
     public void settings() {

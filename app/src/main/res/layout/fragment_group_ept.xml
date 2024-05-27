@@ -23,19 +23,48 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent"/>
 
+    <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:ems="10"
+            android:gravity="top"
+            android:textSize="20sp"
+            android:layout_marginTop="25dp"
+            android:textColor="@color/black"
+            android:id="@+id/label_ampl"
+            android:text="@string/ampl"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/text_code"/>
+
 
     <EditText
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:inputType="number"
             android:textSize="20sp"
-            android:layout_marginTop="25dp"
+            android:layout_marginTop="5dp"
             android:gravity="top"
             android:id="@+id/text_ampl"
             android:hint="@string/ampl_hint"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/text_code"/>
+            app:layout_constraintTop_toBottomOf="@+id/label_ampl"/>
+
+    <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:ems="10"
+            android:gravity="top"
+            android:textSize="20sp"
+            android:layout_marginTop="25dp"
+            android:textColor="@color/black"
+            android:id="@+id/label_time"
+            android:text="@string/step"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/text_ampl"/>
+
 
     <EditText
             android:layout_width="match_parent"
@@ -44,82 +73,28 @@
             android:ems="10"
             android:gravity="top"
             android:textSize="20sp"
-            android:layout_marginTop="25dp"
+            android:layout_marginTop="5dp"
             android:id="@+id/text_step_time"
             android:hint="@string/step_time_hint"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/text_ampl"/>
+            app:layout_constraintTop_toBottomOf="@+id/label_time"/>
 
 
-
-    <LinearLayout
+    <Button
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:id="@+id/type_linear"
-            android:gravity="top"
-            android:orientation="horizontal"
-            android:layout_marginTop="25dp"
+            android:id="@+id/save_code_settings"
+            android:text="@string/save_new_ept_button"
+            android:layout_column="1"
+            android:layout_margin="8dp"
+            android:layout_gravity="center|fill"
+            android:layout_columnWeight="1"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/text_step_time">
-
-        <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:textSize="20sp"
-                android:id="@+id/text_type"
-                android:text="@string/type_text"/>
-        <Spinner
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:id="@+id/spinner_type"/>
-    </LinearLayout>
+            app:layout_constraintBottom_toBottomOf="parent"
+            android:background="@drawable/button_background"/>
 
 
-    <GridLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:columnCount="2"
-            android:id="@+id/grid3"
-            android:gravity="bottom"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintBottom_toBottomOf="parent">
-
-<!--        <Button-->
-<!--                android:layout_width="0dp"-->
-<!--                android:layout_height="match_parent"-->
-<!--                android:id="@+id/codes"-->
-<!--                android:text="@string/codes"-->
-<!--                android:layout_columnSpan="2"-->
-<!--                android:layout_marginEnd="5dp"-->
-<!--                android:layout_marginStart="5dp"-->
-<!--                android:layout_marginBottom="25dp"-->
-<!--                android:layout_gravity="center|fill"-->
-<!--                android:layout_columnWeight="1"-->
-<!--                android:background="@drawable/button_background"/>-->
-
-        <Button
-                android:layout_width="0dp"
-                android:layout_height="match_parent"
-                android:id="@+id/cancel_code_settings"
-                android:text="@string/cancel_button"
-                android:layout_column="0"
-                android:layout_marginEnd="5dp"
-                android:layout_gravity="center|fill"
-                android:layout_columnWeight="1"
-                android:background="@drawable/button_background"/>
-        <Button
-                android:layout_width="0dp"
-                android:layout_height="match_parent"
-                android:id="@+id/save_code_settings"
-                android:text="@string/save_button"
-                android:layout_column="1"
-                android:layout_marginStart="5dp"
-                android:layout_gravity="center|fill"
-                android:layout_columnWeight="1"
-                android:background="@drawable/button_background"/>
-    </GridLayout>
 
 </android.support.constraint.ConstraintLayout>

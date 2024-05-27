@@ -3,8 +3,10 @@
         xmlns:android="http://schemas.android.com/apk/res/android"
         xmlns:app="http://schemas.android.com/apk/res-auto"
         xmlns:tools="http://schemas.android.com/tools"
+        android:id="@+id/fragment_group_data"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+
         android:descendantFocusability="beforeDescendants"
         android:focusableInTouchMode="true"
         tools:context=".GroupDataFragment">
@@ -86,5 +88,7 @@
                 android:layout_columnWeight="2"
                 android:background="@drawable/button_background"/>
     </GridLayout>
+
+
     />
 </android.support.constraint.ConstraintLayout>

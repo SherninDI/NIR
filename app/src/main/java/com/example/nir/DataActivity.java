@@ -132,9 +132,9 @@ public class DataActivity extends AppCompatActivity {
         groupDataBuffer = ByteBuffer.wrap(groupData);
 
         commandFormat = new CommandFormat();
-
+        openGroups();
         if (groups.size() != 0) {
-            openGroups();
+
             groupAdapter = new GroupAdapter(getApplicationContext(), groups);
             groupList.setAdapter(groupAdapter);
             groupAdapter.notifyDataSetChanged();

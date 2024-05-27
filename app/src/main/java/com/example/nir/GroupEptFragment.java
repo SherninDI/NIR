@@ -99,39 +99,39 @@ public class GroupEptFragment extends Fragment {
 //            }
 //        });
 
-        binding.saveCodeSettings.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (!TextUtils.isEmpty(codeAmpl.getText()) && !TextUtils.isEmpty(codeTime.getText())) {
-                    String type = typeSpinner.getSelectedItem().toString();
-                    int ampl = Integer.parseInt(String.valueOf(codeAmpl.getText()));
-                    int time = Integer.parseInt(String.valueOf(codeTime.getText()));
-                    GroupFormat groupFormat = new GroupFormat(group);
-                    int stepCount = groupFormat.readStepCount();
-                    groupFormat.writeStep(type, code, ampl, time, stepCount);
-                    groupFormat.writeStepCount(stepCount + 1);
-
-                    Log.e(TAG, String.valueOf(stepCount));
-                    try {
-                        fileHandler.writeBytesToPosition(group, position);
-                        NavHostFragment.findNavController(GroupEptFragment.this)
-                                .navigate(R.id.action_GroupEptFragment_to_GroupDataFragment);
-                    } catch (IOException e) {
-                        throw new RuntimeException(e);
-                    }
-                } else {
-
-                }
-
-
-            }
-        });
+//        binding.saveCodeSettings.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//                if (!TextUtils.isEmpty(codeAmpl.getText()) && !TextUtils.isEmpty(codeTime.getText())) {
+//                    String type = typeSpinner.getSelectedItem().toString();
+//                    int ampl = Integer.parseInt(String.valueOf(codeAmpl.getText()));
+//                    int time = Integer.parseInt(String.valueOf(codeTime.getText()));
+//                    GroupFormat groupFormat = new GroupFormat(group);
+//                    int stepCount = groupFormat.readStepCount();
+//                    groupFormat.writeStep(type, code, ampl, time, stepCount);
+//                    groupFormat.writeStepCount(stepCount + 1);
+//
+//                    Log.e(TAG, String.valueOf(stepCount));
+//                    try {
+//                        fileHandler.writeBytesToPosition(group, position);
+//                        NavHostFragment.findNavController(GroupEptFragment.this)
+//                                .navigate(R.id.action_GroupEptFragment_to_GroupDataFragment);
+//                    } catch (IOException e) {
+//                        throw new RuntimeException(e);
+//                    }
+//                } else {
+//
+//                }
+//
+//
+//            }
+//        });
 
         binding.cancelCodeSettings.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                NavHostFragment.findNavController(GroupEptFragment.this)
-                        .navigate(R.id.action_GroupEptFragment_to_GroupDataFragment);
+//                NavHostFragment.findNavController(GroupEptFragment.this)
+//                        .navigate(R.id.action_GroupEptFragment_to_GroupDataFragment);
             }
         });
     }

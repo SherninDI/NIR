@@ -14,7 +14,11 @@ import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
 import android.widget.EditText;
 import android.widget.TextView;
+import androidx.navigation.NavArgument;
+import androidx.navigation.NavController;
+import androidx.navigation.Navigation;
 import androidx.navigation.fragment.NavHostFragment;
+import androidx.navigation.ui.NavigationUI;
 import com.example.nir.databinding.FragmentGroupDataBinding;
 
 import java.io.File;
@@ -26,18 +30,29 @@ public class GroupDataFragment extends Fragment {
     private FragmentGroupDataBinding binding;
     private DatabaseAdapter databaseAdapter;
     private ArrayList<ItemEpt> ept = new ArrayList<>();
-
     private RecyclerView eptList;
     private EptAdapter eptAdapter;
-
     private int position;
 
-    private File file;
-    private FileHandler fileHandler;
+    private final String FILE_NAME = "groups.grf";
+    private final String SAVE_FILE_NAME = "save.grf";
 
+    private File file;
+    private File saveFile;
+    private FileHandler fileHandler;
+    private FileHandler saveFileHandler;
     private byte[] groupsByte = new byte[51200];
     private byte[] group = new byte[512];
     private int groupSize = 512;
+
+    @Override
+    public void onAttach(Activity activity) {
+        super.onAttach(activity);
+        Bundle bundle = activity.getIntent().getExtras();
+        if (bundle != null) {
+            position = bundle.getInt("group_position");
+        }
+    }
 
     @Override
     public View onCreateView(
@@ -49,6 +64,10 @@ public class GroupDataFragment extends Fragment {
         return binding.getRoot();
     }
 
+    private File getExternalPath() {
+        return new File(getActivity().getExternalFilesDir(null), SAVE_FILE_NAME);
+    }
+
     public void onViewCreated(@NonNull View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         eptList = view.findViewById(R.id.ept_list);
@@ -57,17 +76,27 @@ public class GroupDataFragment extends Fragment {
         databaseAdapter.createDataBase();
         databaseAdapter.openDataBase();
 
-        Bundle bundle = getArguments();
-        if (bundle != null) {
-            position = bundle.getInt("group_position");
-//            String name = bundle.getString("group_name");
-//            getActivity().setTitle(getString(R.string.group, name));
-        }
+//        Bundle bundle = getArguments();
+//        if (bundle != null) {
+//            position = bundle.getInt("group_position");
+//
+////            String name = bundle.getString("group_name");
+////            getActivity().setTitle(getString(R.string.group, name));
+//        }
 
-        Log.e(TAG,"group pos " + position);
 
-        file = new File(getActivity().getFilesDir(), "groups.grf");
+        NavController navController = Navigation.findNavController(this.getActivity(), R.id.nav_host_fragment_content_group_data);
+
+
+
+
+        Log.i("data", String.valueOf(position));
+
+//        Log.e(TAG,"group pos " + position);
+
+        file = new File(getActivity().getFilesDir(), FILE_NAME);
         fileHandler = new FileHandler(file);
+        saveFileHandler = new FileHandler(getExternalPath());
         try {
             group = fileHandler.readBytesFromPosition(position);
             Log.i(TAG,position + " " + bytesToHex(group));
@@ -164,15 +193,15 @@ public class GroupDataFragment extends Fragment {
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
         switch(id){
-            case R.id.action_add_ept:
-                add();
-                return true;
-            case R.id.action_settings_ept:
-                settings();
-                return true;
-            case R.id.action_del_ept:
-                deleteGroup();
-                return true;
+//            case R.id.action_add_ept:
+//                add();
+//                return true;
+//            case R.id.action_settings_ept:
+//                settings();
+//                return true;
+//            case R.id.action_del_ept:
+//                deleteGroup();
+//                return true;
         }
         return super.onOptionsItemSelected(item);
     }
@@ -181,17 +210,18 @@ public class GroupDataFragment extends Fragment {
     public void settings() {
         Bundle bundle = new Bundle();
         bundle.putInt("group_position", position);
-        NavHostFragment.findNavController(GroupDataFragment.this)
-                .navigate(R.id.action_GroupDataFragment_to_GroupSettingsFragment, bundle);
+//        NavHostFragment.findNavController(GroupDataFragment.this)
+//                .navigate(R.id.action_GroupDataFragment_to_GroupSettingsFragment, bundle);
     }
 
     public void add() {
         Bundle bundle = new Bundle();
         bundle.putInt("group_position", position);
-        NavHostFragment.findNavController(GroupDataFragment.this)
-                .navigate(R.id.action_GroupDataFragment_to_CodesFragment, bundle);
+//        NavHostFragment.findNavController(GroupDataFragment.this)
+//                .navigate(R.id.action_GroupDataFragment_to_CodesFragment, bundle);
     }
 
+    //////////
     public void deleteGroup() {
         try {
             fileHandler.deleteBytesFromPosition(position);
@@ -199,6 +229,22 @@ public class GroupDataFragment extends Fragment {
             startActivity(intent);
         } catch (IOException e) {
             throw new RuntimeException(e);
+        }
+    }
+    //////
+
+
+    public void saveFile() {
+
+    }
+
+    public void openFile() {
+
+    }
+
+    public void createFile() {
+        for (int i = 0; i < 100; i++) {
+
         }
     }
 

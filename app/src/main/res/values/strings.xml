@@ -17,14 +17,25 @@
     <string name="receive_button">Получить</string>
     <string name="cancel_button">Отменить</string>
     <string name="reset_button">Сбросить</string>
+    <string name="continue_button">Продолжить</string>
 
+    <string name="tab1">Название</string>
+    <string name="tab1_label">Название группы</string>
+    <string name="tab2">Список</string>
+    <string name="tab2_label">Список воздействий</string>
+    <string name="tab3_label">Новое воздействие</string>
+    <string name="tab3">Добавить</string>
+
+    <string name="group_name_text">Название группы № %1$d</string>
+    <string name="group_time_text">Время выполнения группы: %1$s</string>
     <string name="add_button">Добавить группу</string>
-    <string name="refresh_groups_button">Обновить группы</string
+    <string name="refresh_groups_button">Обновить группы</string>
     <string name="clean_button">Очистить группы</string>
     <string name="save_button">Сохранить группы в файл</string>
     <string name="open_button">Открыть группы из файла</string>
 
     <string name="save_groups_button">Сохранить воздействия</string>
+    <string name="save_name_button">Сохранить название</string>
     <string name="delete_button">Удалить</string>
     <string name="delete_ept_button">Удалить группу</string>
     <string name="add_ept_button">Добавить воздействие</string>
@@ -63,7 +74,6 @@
     <string name="ampl">Амплитуда</string>
     <string name="step">Время шага</string>
     <string name="received">Данные получены! Обновите группы</string>
-
 
 
     <!-- Strings used for fragments for navigation -->

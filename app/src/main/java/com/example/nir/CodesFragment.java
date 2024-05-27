@@ -1,5 +1,6 @@
 package com.example.nir;
 
+import android.app.Activity;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
@@ -26,6 +27,15 @@ public class CodesFragment extends Fragment {
     private String codeName;
 
     private int position;
+
+    @Override
+    public void onAttach(Activity activity) {
+        super.onAttach(activity);
+        Bundle bundle = activity.getIntent().getExtras();
+        if (bundle != null) {
+            position = bundle.getInt("group_position");
+        }
+    }
     @Override
     public View onCreateView(
             LayoutInflater inflater, ViewGroup container,
@@ -43,6 +53,13 @@ public class CodesFragment extends Fragment {
         if (bundle != null) {
             position = bundle.getInt("group_position");
         }
+
+
+
+        Log.i("codes", String.valueOf(position));
+
+
+
 
         EditText searchText = view.findViewById(R.id.text_search_code);
         RecyclerView eptList = view.findViewById(R.id.code_list);
@@ -90,8 +107,9 @@ public class CodesFragment extends Fragment {
                 bundle.putString("codeName", codeName);
 //                bundle.putBoolean("add", true);
                 bundle.putInt("group_position", position);
-                NavHostFragment.findNavController(CodesFragment.this)
-                        .navigate(R.id.action_CodesFragment_to_GroupEptFragment, bundle);
+
+//                NavHostFragment.findNavController(CodesFragment.this)
+//                        .navigate(R.id.action_CodesFragment_to_GroupEptFragment, bundle);
             }
         });
 
@@ -100,8 +118,8 @@ public class CodesFragment extends Fragment {
             public void onClick(View v) {
                 Bundle bundle = new Bundle();
                 bundle.putInt("group_position", position);
-                NavHostFragment.findNavController(CodesFragment.this)
-                        .navigate(R.id.action_CodesFragment_to_GroupDataFragment, bundle);
+//                NavHostFragment.findNavController(CodesFragment.this)
+//                        .navigate(R.id.action_CodesFragment_to_GroupDataFragment, bundle);
             }
         });
 

@@ -73,6 +73,9 @@ public class FileHandler {
         }
     }
 
+//        public void deleteBytesFromPosition(int position) throws IOException {
+//
+//        }
     public void close() {
         try {
             randomAccessFile.close();

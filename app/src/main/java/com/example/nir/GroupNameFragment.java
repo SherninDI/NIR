@@ -20,7 +20,7 @@ import java.io.IOException;
 
 public class GroupNameFragment extends Fragment {
 
-
+    private final String POSITION = "group_position";
     private int position;
     private static final String FILE_NAME = "groups.grf";
 
@@ -29,7 +29,7 @@ public class GroupNameFragment extends Fragment {
         super.onAttach(activity);
         Bundle bundle = activity.getIntent().getExtras();
         if (bundle != null) {
-            position = bundle.getInt("group_position");
+            position = bundle.getInt(POSITION);
         }
     }
 
@@ -67,6 +67,8 @@ public class GroupNameFragment extends Fragment {
                 String title = editTitle.getText().toString();
                 if (inputValidatorHelper.isValidTitle(title)) {
                     if (!inputValidatorHelper.isNullOrEmpty(title)) {
+                        byte empty[] = new byte[15];
+                        groupFormat.writeEmptyTitle();
                         groupFormat.writeFileId();
                         groupFormat.writeTitle(title);
                         groupFormat.writeCRC();

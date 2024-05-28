@@ -36,13 +36,14 @@ public class DataActivity extends AppCompatActivity {
     private Button send, receive, reset;
     private RecyclerView groupList;
     private GroupAdapter groupAdapter;
+
     private List<String> groups = new ArrayList<>();
     private byte[] groupsByte = new byte[51200];
     private byte[] group = new byte[512];
     private int groupSize = 512;
     int counter = 0;
 
-
+    private final String POSITION = "group_position";
     private static final String FILE_NAME = "groups.grf";
     private static final String SAVE_FILE_NAME = "save.grf";
     private static final String ACTION_USB_PERMISSION = "com.android.example.USB_PERMISSION";
@@ -143,7 +144,7 @@ public class DataActivity extends AppCompatActivity {
                 public void onGroupClick(int position, View itemView) {
                     TextView textView = (TextView) itemView.findViewById(R.id.tvGroupName) ;
                     Intent intent = new Intent(DataActivity.this, GroupDataActivity.class);
-                    intent.putExtra("group_position", position);
+                    intent.putExtra(POSITION, position);
 //                    intent.putExtra("new", false);
 //                    intent.putExtra("name", textView.getText().toString());
                     startActivity(intent);
@@ -288,6 +289,9 @@ public class DataActivity extends AppCompatActivity {
                     String title = groupFormat.readTitle() +
                             " " + "(" + groupFormat.readStepCount() + ")";
                     groups.add(title);
+                } else {
+                    String emptyTitle = "Группа" + " " + i;
+                    groups.add(emptyTitle);
                 }
             }
             fileHandler.close();
@@ -385,13 +389,13 @@ public class DataActivity extends AppCompatActivity {
                 saveGroups();
                 openGroups();
                 return true;
-            case R.id.action_add:
-                Intent intent = new Intent(DataActivity.this, GroupDataActivity.class);
-//                intent.putExtra("new", true);
-                intent.putExtra("group_position", groups.size());
-                startActivity(intent);
-                Log.e(TAG, "add group pos " + String.valueOf(groups.size()));
-                return true;
+//            case R.id.action_add:
+//                Intent intent = new Intent(DataActivity.this, GroupDataActivity.class);
+////                intent.putExtra("new", true);
+//                intent.putExtra("group_position", groups.size());
+//                startActivity(intent);
+//                Log.e(TAG, "add group pos " + String.valueOf(groups.size()));
+//                return true;
 //            case R.id.action_cancel:
 //                commandCancel();
 //                return true;

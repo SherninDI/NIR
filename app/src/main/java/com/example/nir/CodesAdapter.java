@@ -11,22 +11,22 @@ import android.widget.TextView;
 import java.util.ArrayList;
 import java.util.List;
 
-public class EptAdapter extends RecyclerView.Adapter<EptAdapter.ViewHolder>{
+public class CodesAdapter extends RecyclerView.Adapter<CodesAdapter.ViewHolder>{
     private final ArrayList<ItemEpt> ept;
     int selected_position = -1;
     private final LayoutInflater mInflater;
-    private static EptClickListener eptClickListener;
+    private static CodeClickListener codeClickListener;
 
     // data is passed into the constructor
-    EptAdapter(Context context, ArrayList<ItemEpt> ept) {
+    CodesAdapter(Context context, ArrayList<ItemEpt> ept) {
         this.mInflater = LayoutInflater.from(context);
         this.ept = ept;
     }
 
     // inflates the row layout from xml when needed
     @Override
-    public EptAdapter.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        View view = mInflater.inflate(R.layout.list_item_ept, parent, false);
+    public CodesAdapter.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+        View view = mInflater.inflate(R.layout.list_item_code, parent, false);
         return new ViewHolder(view);
     }
 
@@ -34,11 +34,7 @@ public class EptAdapter extends RecyclerView.Adapter<EptAdapter.ViewHolder>{
     @Override
     public void onBindViewHolder(final ViewHolder holder, final int position) {
         final ItemEpt itemList = ept.get(position);
-        String pos = (position + 1) + ".";
-        holder.tvEptNumber.setText(pos);
-//        holder.tvEptName.setText(itemList.getEptNameText());
-        holder.tvEptAmpl.setText(String.valueOf(itemList.getEptAmpl()));
-        holder.tvEptTime.setText(String.valueOf(itemList.getEptTime()));
+        holder.tvEptName.setText(itemList.getEptNameText());
         holder.tvEptValue.setText(itemList.getEptValueText());
         holder.itemView.setBackgroundColor(selected_position == position ? Color.RED : Color.TRANSPARENT);
     }
@@ -50,24 +46,14 @@ public class EptAdapter extends RecyclerView.Adapter<EptAdapter.ViewHolder>{
     }
 
 
-    public ItemEpt getItem(int position) {
-        return ept.get(position);
-    }
-
-
     // stores and recycles views as they are scrolled off screen
     public class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener{
-        public TextView tvEptNumber;
-        public TextView tvEptAmpl;
-        public TextView tvEptTime;
-//        public TextView tvEptName;
+
+        public TextView tvEptName;
         public TextView tvEptValue;
         public ViewHolder(View itemView) {
             super(itemView);
-            tvEptAmpl = itemView.findViewById(R.id.tvEptAmpl);
-            tvEptTime = itemView.findViewById(R.id.tvEptTime);
-            tvEptNumber = itemView.findViewById(R.id.tvEptNumber);
-//            tvEptName = itemView.findViewById(R.id.tvEptName);
+            tvEptName = itemView.findViewById(R.id.tvEptName);
             tvEptValue = itemView.findViewById(R.id.tvEptValue);
             itemView.setOnClickListener(this);
         }
@@ -78,16 +64,16 @@ public class EptAdapter extends RecyclerView.Adapter<EptAdapter.ViewHolder>{
             notifyItemChanged(selected_position);
             selected_position = getAdapterPosition();
             notifyItemChanged(selected_position);
-            eptClickListener.onEptClick(selected_position,itemView);
+            codeClickListener.onCodeClick(selected_position,itemView);
         }
     }
 
-    public void setOnEptClickListener(EptAdapter.EptClickListener eptClickListener) {
-        EptAdapter.eptClickListener = eptClickListener;
+    public void setOnCodeClickListener(CodesAdapter.CodeClickListener codeClickListener) {
+        CodesAdapter.codeClickListener = codeClickListener;
     }
 
-    public interface EptClickListener {
-        void onEptClick(int position, View itemView);
+    public interface CodeClickListener {
+        void onCodeClick(int position, View itemView);
 
     }
 }

@@ -6,7 +6,12 @@
             android:title="@string/save_group_button" />
 
     <item
-            android:id="@+id/action_del_ept"
+            android:id="@+id/action_group_list"
             android:orderInCategory="3"
+            android:title="@string/group_list_button" />
+
+    <item
+            android:id="@+id/action_del_ept"
+            android:orderInCategory="2"
             android:title="@string/delete_ept_button" />
 </menu>

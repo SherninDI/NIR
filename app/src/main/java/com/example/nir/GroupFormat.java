@@ -80,6 +80,13 @@ public class GroupFormat {
         byte[] titleBytes = title.getBytes(Charset.forName("windows-1251"));
         writeBytes(titleBytes, 9);
     }
+
+    public void writeEmptyTitle() {
+        byte titleLengthByte = 0x00;
+        writeByte(titleLengthByte, 8);
+        byte[] titleBytes = new byte[15];
+        writeBytes(titleBytes, 9);
+    }
     public String readTitle() {
         int length = readByte(8);
         byte[] title = readBytes(length, 9);
@@ -115,10 +122,10 @@ public class GroupFormat {
 
 
 
-    public void writeStep(ItemEpt ept, int ampl, int stepTime, int stepPos) {
-        byte[] typeBytes = ept.getEptType().getBytes(Charset.forName("windows-1251"));
+    public void writeStep(String type, int value, int ampl, int stepTime, int stepPos) {
+        byte[] typeBytes = type.getBytes(Charset.forName("windows-1251"));
         writeBytes(typeBytes, 24 + stepPos * 6);
-        byte[] codeBytes = reverseByteArray(BigInteger.valueOf(ept.getEptValue()).toByteArray());
+        byte[] codeBytes = reverseByteArray(BigInteger.valueOf(value).toByteArray());
         writeBytes(codeBytes, 24 + stepPos * 6 + 1);
         byte[] amplBytes = BigInteger.valueOf(ampl).toByteArray();
         writeBytes(amplBytes, 24 + stepPos * 6 + 3);
@@ -159,7 +166,7 @@ public class GroupFormat {
     public void deleteStep(int position) {
         int stepLength = 6;
         int stepsLength = 480;
-        int stepsPos = 27;
+        int stepsPos = 24;
         byte[] step = new byte[stepLength];
         int afterPos = stepsPos + (position + 1) * stepLength;
         int beforePosStart = stepsPos;
@@ -201,6 +208,10 @@ public class GroupFormat {
         return readByte(511);
     }
 
+    public void writeEmpty() {
+        byte[] empty = new byte[512];
+        writeBytes(empty, 0);
+    }
 
     private void writeBytes(byte[] data, int position) {
         if (position < 0 || position >= byteArray.length) {

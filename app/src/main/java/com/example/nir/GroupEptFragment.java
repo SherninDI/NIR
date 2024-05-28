@@ -26,13 +26,16 @@ import java.util.List;
 
 public class GroupEptFragment extends Fragment {
     private final String TAG = GroupEptFragment.class.getSimpleName();
+    private final String POSITION = "group_position";
+    private final String FILE_NAME = "groups.grf";
+    private final String SAVE_FILE_NAME = "save.grf";
     private File file;
     private FileHandler fileHandler;
     private byte[] group = new byte[512];
     private int position;
     private int ept_position;
     private int code = 0;
-
+    private String type;
     private FragmentGroupEptBinding binding;
 
     @Override
@@ -40,7 +43,7 @@ public class GroupEptFragment extends Fragment {
         super.onAttach(activity);
         Bundle bundle = activity.getIntent().getExtras();
         if (bundle != null) {
-            position = bundle.getInt("group_position");
+            position = bundle.getInt(POSITION);
         }
     }
 
@@ -71,19 +74,17 @@ public class GroupEptFragment extends Fragment {
         EditText codeAmpl = view.findViewById(R.id.text_ampl);
         EditText codeTime = view.findViewById(R.id.text_step_time);
 
-
+        Log.i("ept", String.valueOf(position));
         Bundle bundle = getArguments();
         if (bundle != null) {
-//            if (bundle.getBoolean("add")) {
-//
-//            }
             code = bundle.getInt("code");
+            type = bundle.getString("type");
             String codeName = bundle.getString("codeName");
             codeText.setText(codeName);
-            position = bundle.getInt("group_position");
+            position = bundle.getInt(POSITION);
         }
 
-        file = new File(getActivity().getFilesDir(), "groups.grf");
+        file = new File(getActivity().getFilesDir(), FILE_NAME);
         fileHandler = new FileHandler(file);
         try {
             group = fileHandler.readBytesFromPosition(position);
@@ -91,45 +92,55 @@ public class GroupEptFragment extends Fragment {
             throw new RuntimeException(e);
         }
 
-        Log.e(TAG, "group "+ position+" " + bytesToHex(group));
+        InputValidatorHelper inputValidatorHelper = new InputValidatorHelper();
+        GroupFormat groupFormat = new GroupFormat(group);
+//        Log.e(TAG, "group "+ position+" " + bytesToHex(group));
 
-//        binding.codes.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//                Bundle bundle = new Bundle();
-//                bundle.putInt("group_position", position);
-//                NavHostFragment.findNavController(GroupEptFragment.this)
-//                        .navigate(R.id.action_GroupEptFragment_to_CodesFragment, bundle);
-//            }
-//        });
 
-//        binding.saveCodeSettings.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//                if (!TextUtils.isEmpty(codeAmpl.getText()) && !TextUtils.isEmpty(codeTime.getText())) {
-//                    String type = typeSpinner.getSelectedItem().toString();
-//                    int ampl = Integer.parseInt(String.valueOf(codeAmpl.getText()));
-//                    int time = Integer.parseInt(String.valueOf(codeTime.getText()));
-//                    GroupFormat groupFormat = new GroupFormat(group);
-//                    int stepCount = groupFormat.readStepCount();
-//                    groupFormat.writeStep(type, code, ampl, time, stepCount);
-//                    groupFormat.writeStepCount(stepCount + 1);
-//
-//                    Log.e(TAG, String.valueOf(stepCount));
-//                    try {
-//                        fileHandler.writeBytesToPosition(group, position);
-//                        NavHostFragment.findNavController(GroupEptFragment.this)
-//                                .navigate(R.id.action_GroupEptFragment_to_GroupDataFragment);
-//                    } catch (IOException e) {
-//                        throw new RuntimeException(e);
-//                    }
-//                } else {
-//
-//                }
-//
-//
-//            }
-//        });
+        binding.saveCodeSettings.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (!inputValidatorHelper.isNullOrEmpty(codeAmpl.getText().toString())
+                        && Integer.parseInt(codeAmpl.getText().toString()) <= 100
+                        && Integer.parseInt(codeAmpl.getText().toString()) >= 0) {
+                    if (!inputValidatorHelper.isNullOrEmpty(codeTime.getText().toString())
+                            && Integer.parseInt(codeTime.getText().toString()) <= 5999
+                            && Integer.parseInt(codeTime.getText().toString()) >= 0) {
+
+                        int stepCount = groupFormat.readStepCount();
+                        int time = 0;
+
+                        int ampl = Integer.parseInt(String.valueOf(codeAmpl.getText()));
+                        int stepTime = Integer.parseInt(String.valueOf(codeTime.getText()));
+
+                        groupFormat.writeStep(type, code, ampl, stepTime, stepCount);
+                        groupFormat.writeTimeInt(time);
+                        groupFormat.writeStepCount(stepCount + 1);
+                        for (int i = 0; i < groupFormat.readStepCount(); i++) {
+                            time +=groupFormat.readStepTime(i);
+                        }
+                        groupFormat.writeTimeInt(time);
+                        Log.e("time", String.valueOf(time));
+                        groupFormat.writeCRC();
+
+                        try {
+                            fileHandler.writeBytesToPosition(group, position);
+                        } catch (IOException e) {
+                            throw new RuntimeException(e);
+                        }
+                        fileHandler.close();
+                        NavHostFragment.findNavController(GroupEptFragment.this)
+                                .navigate(R.id.action_GroupEptFragment_to_GroupDataFragment);
+
+                    } else {
+                        codeTime.setError("Неверный формат Времени шага");
+                    }
+                } else {
+                    codeAmpl.setError("Неверный формат Амплитуды");
+                }
+
+            }
+        });
 
     }
 

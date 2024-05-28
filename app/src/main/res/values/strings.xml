@@ -33,6 +33,7 @@
     <string name="clean_button">Очистить группы</string>
     <string name="save_button">Сохранить группы в файл</string>
     <string name="save_new_ept_button">Добавить</string>
+    <string name="group_list_button">К списку групп</string>
     <string name="open_button">Открыть группы из файла</string>
 
     <string name="col_num">№</string>

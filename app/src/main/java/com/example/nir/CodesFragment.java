@@ -21,11 +21,13 @@ public class CodesFragment extends Fragment {
     private final String POSITION = "group_position";
     private ArrayList<ItemEpt> ept = new ArrayList<>();
     private DatabaseAdapter databaseAdapter;
-    private EptAdapter eptAdapter;
+    private CodesAdapter codesAdapter;
     private FragmentCodesBinding binding;
 
     private int code;
     private String codeName;
+
+    private String type;
 
     private int position;
 
@@ -50,7 +52,6 @@ public class CodesFragment extends Fragment {
     public void onViewCreated(@NonNull View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        Log.i("codes", String.valueOf(position));
 
         EditText searchText = view.findViewById(R.id.text_search_code);
         RecyclerView eptList = view.findViewById(R.id.code_list);
@@ -79,8 +80,8 @@ public class CodesFragment extends Fragment {
                 }
 
                 Collections.sort(ept);
-                eptAdapter = new EptAdapter(getActivity(), ept);
-                eptList.setAdapter(eptAdapter);
+                codesAdapter = new CodesAdapter(getActivity(), ept);
+                eptList.setAdapter(codesAdapter);
                 onClickListener();
             }
 
@@ -95,6 +96,7 @@ public class CodesFragment extends Fragment {
             public void onClick(View v) {
                 Bundle bundle = new Bundle();
                 bundle.putInt("code", code);
+                bundle.putString("type", type);
                 bundle.putString("codeName", codeName);
 //                bundle.putBoolean("add", true);
                 bundle.putInt(POSITION, position);
@@ -111,8 +113,8 @@ public class CodesFragment extends Fragment {
                 String search = searchText.getText().toString();
                 if (!search.isEmpty()) {
                     ept = searchData(ept, search);
-                    eptAdapter = new EptAdapter(getActivity(), ept);
-                    eptList.setAdapter(eptAdapter);
+                    codesAdapter = new CodesAdapter(getActivity(), ept);
+                    eptList.setAdapter(codesAdapter);
                     onClickListener();
                 }
             }
@@ -123,11 +125,12 @@ public class CodesFragment extends Fragment {
 
     private void onClickListener() {
         if (ept.size() != 0) {
-            eptAdapter.setOnEptClickListener(new EptAdapter.EptClickListener() {
+            codesAdapter.setOnCodeClickListener(new CodesAdapter.CodeClickListener() {
                 @Override
-                public void onEptClick(int position, View itemView) {
+                public void onCodeClick(int position, View itemView) {
                     ItemEpt itemEpt = ept.get(position);
                     code = itemEpt.getEptValue();
+                    type = itemEpt.getEptType();
                     codeName = itemEpt.getEpt();
                 }
             });

@@ -1,5 +1,8 @@
 package com.example.nir;
 
+import android.app.AlertDialog;
+import android.content.DialogInterface;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -7,6 +10,7 @@ import android.support.design.widget.BottomNavigationView;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -21,10 +25,17 @@ import androidx.navigation.ui.AppBarConfiguration;
 import androidx.navigation.ui.NavigationUI;
 import com.example.nir.databinding.ActivityGroupDataBinding;
 
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+
+import static android.app.PendingIntent.getActivity;
+
 public class GroupDataActivity extends AppCompatActivity  {
 
     private final String TAG =  GroupDataActivity.class.getSimpleName();
-
+    private final String FILE_NAME = "groups.grf";
+    private final String SAVE_FILE_NAME = "save.grf";
     private final String POSITION = "group_position";
     private AppBarConfiguration appBarConfiguration;
     private ActivityGroupDataBinding binding;
@@ -81,14 +92,87 @@ public class GroupDataActivity extends AppCompatActivity  {
         switch(id){
             case R.id.action_save_group:
                 Toast.makeText(this, "Группа сохранена", Toast.LENGTH_SHORT).show();
-//                saveGroup();
+                saveGroup();
                 return true;
             case R.id.action_del_ept:
                 Toast.makeText(this, "Группа удалена", Toast.LENGTH_SHORT).show();
-//                deleteGroup();
+                deleteGroup();
+                return true;
+            case R.id.action_group_list:
+
+                AlertDialog.Builder builder = new AlertDialog.Builder(this);
+
+                builder.setMessage("Сохранить группу перед переходом?")
+                        .setTitle("Сохранение")
+                        .setCancelable(true)
+                        .setNeutralButton("Отмена", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int id) {
+                                dialog.cancel();
+                            }
+                        })
+                        .setNegativeButton("Нет", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int id) {
+                                Intent intent = new Intent(GroupDataActivity.this, DataActivity.class);
+                                startActivity(intent);
+                            }
+                        })
+                        .setPositiveButton("Да", new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int id) {
+                                saveGroup();
+                                Intent intent = new Intent(GroupDataActivity.this, DataActivity.class);
+                                startActivity(intent);
+                            }
+                        });
+
+                AlertDialog alert = builder.create();
+
+                alert.show();
                 return true;
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    public void saveGroup() {
+        try {
+            File file = new File(this.getFilesDir(), FILE_NAME);
+            FileHandler fileHandler = new FileHandler(file);
+            byte[] groupsBytes = fileHandler.readBytes(51200);
+            File saveFile = new File(this.getFilesDir(), SAVE_FILE_NAME);
+            try(FileOutputStream fos = new FileOutputStream(saveFile)) {
+                fos.write(groupsBytes);
+            }
+            catch(IOException ex) {
+                Toast.makeText(this, ex.getMessage(), Toast.LENGTH_SHORT).show();
+            }
+            fileHandler.close();
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+
+    public void deleteGroup() {
+        byte[] group = new byte[512];
+        GroupFormat groupFormat = new GroupFormat(group);
+        groupFormat.writeEmpty();
+        groupFormat.writeFileId();
+        groupFormat.writeNumber(position);
+        groupFormat.writeCRC();
+
+        File file = new File(this.getFilesDir(), SAVE_FILE_NAME);
+        FileHandler fileHandler = new FileHandler(file);
+        try {
+            fileHandler.writeBytesToPosition(group, position);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+        fileHandler.close();
+        Intent intent = new Intent(this, DataActivity.class);
+        startActivity(intent);
+
     }
     
 }

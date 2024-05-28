@@ -27,6 +27,7 @@
             android:label="@string/tab3_label"
             tools:layout="@layout/fragment_group_ept">
         />
+        <action android:id="@+id/action_GroupEptFragment_to_GroupDataFragment" app:destination="@id/GroupDataFragment"/>
     </fragment>
 
 

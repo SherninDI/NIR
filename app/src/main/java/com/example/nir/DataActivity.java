@@ -234,6 +234,7 @@ public class DataActivity extends AppCompatActivity {
         try {
             File file = new File(this.getFilesDir(), FILE_NAME);
             FileHandler fileHandler = new FileHandler(file);
+            groups.clear();
             for (int i = 0; i < groupsByte.length / groupSize; i++) {
                 byte[] group = new byte[groupSize];
                 GroupFormat groupFormat = new GroupFormat(group);
@@ -241,8 +242,9 @@ public class DataActivity extends AppCompatActivity {
                 groupFormat.writeFileId();
                 groupFormat.writeCRC();
                 fileHandler.writeBytesToPosition(group, i);
+                groups.add("Группа " + i);
             }
-            groups.clear();
+
             fileHandler.close();
         } catch (IOException e) {
             e.printStackTrace();

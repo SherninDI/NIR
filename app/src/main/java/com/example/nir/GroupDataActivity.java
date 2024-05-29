@@ -15,6 +15,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
+import android.widget.TextView;
 import android.widget.Toast;
 import androidx.navigation.NavArgument;
 import androidx.navigation.NavController;
@@ -41,6 +42,7 @@ public class GroupDataActivity extends AppCompatActivity  {
     private ActivityGroupDataBinding binding;
 
     private int position;
+    private String name;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -49,6 +51,8 @@ public class GroupDataActivity extends AppCompatActivity  {
         setContentView(binding.getRoot());
         BottomNavigationView bottomNavigationView = findViewById(R.id.bottom_navigation_view);
 
+        TextView titleGroup = findViewById(R.id.group_title);
+
         setSupportActionBar(binding.toolbar);
         NavController navController = Navigation.findNavController(this, R.id.nav_host_fragment_content_group_data);
         NavHostFragment navHostFragment = (NavHostFragment) getSupportFragmentManager().findFragmentById(R.id.nav_host_fragment_content_group_data);
@@ -56,6 +60,7 @@ public class GroupDataActivity extends AppCompatActivity  {
         navController.addOnDestinationChangedListener((controller, destination, arguments) -> {
             Bundle bundle = getIntent().getExtras();
             position = bundle.getInt(POSITION);
+
             if (destination.getLabel().equals("Название группы")) {
                 NavArgument argument = new NavArgument.Builder().setDefaultValue(position).build();
                 destination.addArgument(POSITION, argument);
@@ -67,6 +72,20 @@ public class GroupDataActivity extends AppCompatActivity  {
                 destination.addArgument(POSITION, argument);
             }
         });
+
+        try {
+            File file = new File(this.getFilesDir(), FILE_NAME);
+            FileHandler fileHandler = new FileHandler(file);
+            byte[] group = fileHandler.readBytesFromPosition(position);
+            GroupFormat groupFormat = new GroupFormat(group);
+            name = groupFormat.readTitle();
+            fileHandler.close();
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        titleGroup.setText(getString(R.string.group_title, position, name));
 
         appBarConfiguration = new AppBarConfiguration.Builder(navController.getGraph()).build();
         NavigationUI.setupActionBarWithNavController(this, navController, appBarConfiguration);

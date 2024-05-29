@@ -7,13 +7,13 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.SwitchCompat;
 import android.util.Log;
 import android.view.*;
 
 import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
-import android.widget.EditText;
-import android.widget.TextView;
+import android.widget.*;
 import androidx.navigation.NavArgument;
 import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
@@ -23,6 +23,7 @@ import com.example.nir.databinding.FragmentGroupDataBinding;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.attribute.GroupPrincipal;
 import java.util.*;
 
 public class GroupDataFragment extends Fragment {
@@ -31,6 +32,7 @@ public class GroupDataFragment extends Fragment {
     private ArrayList<ItemEpt> ept = new ArrayList<>();
     private RecyclerView eptList;
     private EptAdapter eptAdapter;
+    private EptNameAdapter eptNameAdapter;
     private int position;
 
     private final String FILE_NAME = "groups.grf";
@@ -60,9 +62,6 @@ public class GroupDataFragment extends Fragment {
         return binding.getRoot();
     }
 
-    private File getExternalPath() {
-        return new File(getActivity().getExternalFilesDir(null), SAVE_FILE_NAME);
-    }
 
     public void onViewCreated(@NonNull View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
@@ -70,7 +69,11 @@ public class GroupDataFragment extends Fragment {
 
         Log.i("data", String.valueOf(position));
 
+        TableLayout tableLayout = view.findViewById(R.id.table1);
+        SwitchCompat switchCompat = view.findViewById(R.id.switch_list);
+
         openEpt();
+
 
 
         byte[] group = new byte[groupSize];
@@ -97,95 +100,122 @@ public class GroupDataFragment extends Fragment {
             }
         });
         AlertDialog dialog = builderCode.create();
+        switchCompat.setChecked(false);
 
         if (ept.size() != 0) {
             eptAdapter = new EptAdapter(getActivity(), ept);
             eptList.setAdapter(eptAdapter);
-            eptAdapter.setOnEptClickListener(new EptAdapter.EptClickListener() {
-                @Override
-                public void onEptClick(int pos, View itemView) {
-                    ItemEpt itemEpt = eptAdapter.getItem(pos);
-                    dialog.setTitle(itemEpt.getEptNameText());
-
-                    int ampl = itemEpt.getEptAmpl();
-                    int stepTime = itemEpt.getEptTime();
-
-//                    int ampl = groupFormat.readAmpl(position);
-//                    int stepTime = groupFormat.readStepTime(position);
-
-                    dialog.show();
-
-                    EditText editAmpl = dialog.findViewById(R.id.step_ampl);
-                    EditText editStepTime = dialog.findViewById(R.id.step_time);
-                    editAmpl.setText(String.valueOf(ampl & 0xFFFF));
-                    editStepTime.setText(String.valueOf(stepTime & 0xFFFF));
-
-                    dialog.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener(new View.OnClickListener() {
-                        @Override
-                        public void onClick(View v) {
-                            int newAmpl = Integer.parseInt(String.valueOf(editAmpl.getText()));
-                            int newTime = Integer.parseInt(String.valueOf(editStepTime.getText()));
-                            int time = 0;
-                            groupFormat.writeAmpl(newAmpl, pos);
-                            groupFormat.writeTimeInt(time);
-                            groupFormat.writeStepTime(newTime,pos);
-                            for (int i = 0; i < groupFormat.readStepCount(); i++) {
-                                time +=groupFormat.readStepTime(i);
-                            }
-                            groupFormat.writeTimeInt(time);
-                            Log.e("time", String.valueOf(time));
-                            groupFormat.writeCRC();
-                            saveEpt(groupFormat.getBytes());
-                            openEpt();
-                            dialog.dismiss();
-                        }
-                    });
-                    dialog.getButton(AlertDialog.BUTTON_NEGATIVE).setOnClickListener(new View.OnClickListener() {
-                        @Override
-                        public void onClick(View v) {
-                            int stepCount = groupFormat.readStepCount();
-                            int time = 0;
-
-                            Log.e(TAG, bytesToHex(groupFormat.readStep(pos)));
-
-                            groupFormat.deleteStep(pos);
-                            groupFormat.writeStepCount(stepCount - 1);
-                            for (int i = 0; i < groupFormat.readStepCount(); i++) {
-                                time +=groupFormat.readStepTime(i);
-                            }
-                            groupFormat.writeTimeInt(time);
-                            groupFormat.writeCRC();
-
-//                            Log.e(TAG, bytesToHex(groupFormat.readStep(pos)));
-//                            int stepCount = groupFormat.readStepCount();
-//                            int time = 0;
-//                            groupFormat.writeStepCount(stepCount - 1);
-//                            groupFormat.deleteStep(pos);
-//                            for (int i = 0; i < groupFormat.readStepCount(); i++) {
-//                                time +=groupFormat.readStepTime(i);
-//                            }
-//                            groupFormat.writeTimeInt(time);
-//                            Log.e("time", String.valueOf(time));
-//
-//
-                            File file1 = new File(getActivity().getFilesDir(), FILE_NAME);
-                            FileHandler fileHandler1 = new FileHandler(file1);
-                            try {
-                                fileHandler1.writeBytesToPosition(groupFormat.getBytes(), position);
-                            } catch (IOException e) {
-                                throw new RuntimeException(e);
-                            }
-                            fileHandler1.close();
-//                            groupFormat.writeCRC();
-                            ept.remove(pos);
-                            eptAdapter.notifyDataSetChanged();
-                            dialog.dismiss();
-                        }
-                    });
-                }
+            eptAdapter.notifyDataSetChanged();
+            eptAdapter.setOnEptClickListener((pos, itemView) -> {
+                editEpt(pos,  dialog, groupFormat);
             });
         }
+        switchCompat.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                View view = tableLayout.getChildAt(0);
+                TableRow row = (TableRow) view;
+                if (view instanceof TableRow) {
+                    TextView eptNum = row.findViewById(R.id.tvEptNumber);
+                    eptNum.setText(R.string.col_num);
+                    TextView eptValue= row.findViewById(R.id.tvEptValue);
+                    eptValue.setText(R.string.col_val);
+                    if (isChecked) {
+                        TextView eptName = row.findViewById(R.id.tvEptAmpl);
+                        eptName.setText(R.string.switch_list_on);
+                        TextView eptTime = row.findViewById(R.id.tvEptTime);
+                        eptTime.setText("");
+                        openEpt();
+
+                        if (ept.size() != 0) {
+                            eptNameAdapter = new EptNameAdapter(getActivity(), ept);
+                            eptList.setAdapter(eptNameAdapter);
+                            eptNameAdapter.notifyDataSetChanged();
+                            eptNameAdapter.setOnEptNameClickListener((pos, itemView) -> {
+                                editEpt(pos,  dialog, groupFormat);
+                            });
+                        }
+                    }
+                    else {
+                        TextView eptAmpl = row.findViewById(R.id.tvEptAmpl);
+                        eptAmpl.setText(R.string.col_ampl);
+                        TextView eptTime = row.findViewById(R.id.tvEptTime);
+                        eptTime.setText(R.string.col_time);
+                        openEpt();
+
+
+                        if (ept.size() != 0) {
+                            eptAdapter = new EptAdapter(getActivity(), ept);
+                            eptList.setAdapter(eptAdapter);
+                            eptAdapter.notifyDataSetChanged();
+                            eptAdapter.setOnEptClickListener((pos, itemView) -> {
+                                editEpt(pos,  dialog, groupFormat);
+                            });
+                        }
+                    }
+                }
+            }
+        });
+
+
+
         fileHandler.close();
+    }
+
+    public void editEpt(int pos, AlertDialog dialog, GroupFormat groupFormat) {
+        ItemEpt itemEpt = eptAdapter.getItem(pos);
+        dialog.setTitle(itemEpt.getEptNameText());
+
+        int ampl = itemEpt.getEptAmpl();
+        int stepTime = itemEpt.getEptTime();
+
+        dialog.show();
+
+        EditText editAmpl = dialog.findViewById(R.id.step_ampl);
+        EditText editStepTime = dialog.findViewById(R.id.step_time);
+        editAmpl.setText(String.valueOf(ampl & 0xFFFF));
+        editStepTime.setText(String.valueOf(stepTime & 0xFFFF));
+
+        dialog.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener(v -> {
+            int newAmpl = Integer.parseInt(String.valueOf(editAmpl.getText()));
+            int newTime = Integer.parseInt(String.valueOf(editStepTime.getText()));
+            int time = 0;
+            groupFormat.writeAmpl(newAmpl, pos);
+            groupFormat.writeTimeInt(time);
+            groupFormat.writeStepTime(newTime,pos);
+            for (int i = 0; i < groupFormat.readStepCount(); i++) {
+                time +=groupFormat.readStepTime(i);
+            }
+            groupFormat.writeTimeInt(time);
+            groupFormat.writeCRC();
+            saveEpt(groupFormat.getBytes());
+            openEpt();
+            dialog.dismiss();
+        });
+        dialog.getButton(AlertDialog.BUTTON_NEGATIVE).setOnClickListener(v -> {
+            int stepCount = groupFormat.readStepCount();
+            int time = 0;
+
+            groupFormat.deleteStep(pos);
+            groupFormat.writeStepCount(stepCount - 1);
+            for (int i = 0; i < groupFormat.readStepCount(); i++) {
+                time +=groupFormat.readStepTime(i);
+            }
+            groupFormat.writeTimeInt(time);
+            groupFormat.writeCRC();
+
+            File file1 = new File(getActivity().getFilesDir(), FILE_NAME);
+            FileHandler fileHandler1 = new FileHandler(file1);
+            try {
+                fileHandler1.writeBytesToPosition(groupFormat.getBytes(), position);
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+            fileHandler1.close();
+            ept.remove(pos);
+            eptAdapter.notifyDataSetChanged();
+            dialog.dismiss();
+        });
     }
 
 
@@ -222,10 +252,6 @@ public class GroupDataFragment extends Fragment {
             throw new RuntimeException(e);
         }
         fileHandler.close();
-
-        eptAdapter = new EptAdapter(getActivity(), ept);
-        eptList.setAdapter(eptAdapter);
-        eptAdapter.notifyDataSetChanged();
     }
 
 
@@ -238,40 +264,6 @@ public class GroupDataFragment extends Fragment {
             throw new RuntimeException(e);
         }
         fileHandler.close();
-    }
-
-    public void add() {
-//        Bundle bundle = new Bundle();
-//        bundle.putInt("group_position", position);
-//        NavHostFragment.findNavController(GroupDataFragment.this)
-//                .navigate(R.id.action_GroupDataFragment_to_CodesFragment, bundle);
-    }
-
-//    //////////
-//    public void deleteGroup() {
-//        try {
-//            fileHandler.deleteBytesFromPosition(position);
-//            Intent intent = new Intent(getActivity(), DataActivity.class);
-//            startActivity(intent);
-//        } catch (IOException e) {
-//            throw new RuntimeException(e);
-//        }
-//    }
-//    //////
-
-
-
-    public String bytesToHex(byte[] byteArray)
-    {
-        String hex = "";
-
-        // Iterating through each byte in the array
-        for (byte i : byteArray) {
-            hex += String.format("%02X", i);
-            hex += " ";
-        }
-
-        return hex;
     }
     @Override
     public void onDestroyView() {

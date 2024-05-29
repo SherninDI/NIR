@@ -8,10 +8,12 @@ import android.content.IntentFilter;
 import android.hardware.usb.*;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.widget.SwitchCompat;
 import android.text.method.ScrollingMovementMethod;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.CompoundButton;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -30,6 +32,8 @@ public class MainActivity extends AppCompatActivity {
     TextView deviceText;
     TextView contentText;
 
+    SwitchCompat switchCompat;
+
     UsbDevice usbDevice;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -40,6 +44,7 @@ public class MainActivity extends AppCompatActivity {
         refresh = findViewById(R.id.refresh);
         deviceText = findViewById(R.id.device);
         contentText = findViewById(R.id.content);
+        switchCompat = findViewById(R.id.switch_chars);
 
         File file = new File(this.getFilesDir(), "groups.grf");
         FileHandler fileHandler = new FileHandler(file);
@@ -107,8 +112,19 @@ public class MainActivity extends AppCompatActivity {
                 }
             }
             deviceText.setText(getString(R.string.device_found, device.getProductName()));
+            contentText.setText("");
 //            contentText.setMovementMethod(new ScrollingMovementMethod());
-            contentText.setText(chars.toString());
+            switchCompat.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+                @Override
+                public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                    if (isChecked) {
+                        contentText.setText(chars.toString());
+                    } else {
+                        contentText.setText("");
+                    }
+                }
+            });
+//            contentText.setText(chars.toString());
         }
         return device;
     }

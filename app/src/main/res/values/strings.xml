@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">Диплом</string>
+    <string name="app_name">ПО "Имедис-Эксперт"</string>
     <string name="data">Группы воздействий</string>
     <string name="connect_button">Подключиться</string>
     <string name="refresh_button">Обновить</string>
@@ -8,16 +8,21 @@
     <string name="device_found">Устройство обнаружено:\n%1$s</string>
     <string name="device_not_found">Устройство не обнаружено</string>
     <string name="device_not_found_content">Не доступны</string>
-    <string name="device_found_chars">Характеристики устройства:</string>
+    <string name="device_found_chars">Показать свойства устройства</string>
     <string name="device_found_content">Имя производителя %1$s\nID устройства %2$d\nID продукта %3$d\nVendor ID
         устройства %4$d\nВерсия %5$s\nСерийный номер %6$s\nПротокол %7$d\nКласс %8$d\nПодкласс %9$d\nКоличество
         интерфейсов %10$d\n
     </string>
-    <string name="send_button">Отправить</string>
-    <string name="receive_button">Получить</string>
+    <string name="send_button">Отправить группы в аппарат</string>
+    <string name="receive_button">Получить группы из аппарата</string>
     <string name="cancel_button">Отменить</string>
-    <string name="reset_button">Сбросить</string>
+    <string name="reset_button">Сбросить аппарат</string>
     <string name="continue_button">Продолжить</string>
+
+    <string name="group_title">Группа № %1$d: %2$s</string>
+    <string name="switch_list">Режим отображения</string>
+    <string name="switch_list_off">Код</string>
+    <string name="switch_list_on">Название</string>
 
     <string name="tab1">Название</string>
     <string name="tab1_label">Название группы</string>
@@ -81,7 +86,7 @@
     <string name="search_text">Введите название или код</string>
     <string name="ampl">Амплитуда</string>
     <string name="step">Время шага</string>
-    <string name="received">Данные получены! Обновите группы</string>
+    <string name="received">Группы получены! Обновите группы</string>
 
 
     <!-- Strings used for fragments for navigation -->

@@ -21,18 +21,36 @@
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintBottom_toTopOf="@+id/title"
             />
-    <TextView
+<!--    <TextView-->
+<!--            android:layout_width="wrap_content"-->
+<!--            android:layout_height="wrap_content"-->
+<!--            android:id="@+id/title"-->
+<!--            android:gravity="start"-->
+<!--            android:text="@string/device_found_chars"-->
+<!--            android:textSize="20sp"-->
+<!--            android:layout_marginTop="10dp"-->
+<!--            app:layout_constraintStart_toStartOf="parent"-->
+<!--            app:layout_constraintTop_toBottomOf="@+id/device"-->
+<!--            app:layout_constraintBottom_toTopOf="@+id/scroll"-->
+<!--    />-->
+    <android.support.v7.widget.SwitchCompat
+            android:text="@string/device_found_chars"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:id="@+id/title"
-            android:text="@string/device_found_chars"
-            android:textSize="20sp"
-            android:layout_marginTop="10dp"
+            android:textSize="16sp"
+            android:id="@+id/switch_chars"
+            android:layout_marginTop="8dp"
+            android:layout_marginBottom="8dp"
+            app:showText="true"
+            android:checked="false"
+            android:textOff="Нет"
+            android:textOn="Да"
+            app:track="@drawable/track"
+            android:thumb="@drawable/thumb"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/device"
-            app:layout_constraintBottom_toTopOf="@+id/scroll"
-    />
+            app:layout_constraintBottom_toTopOf="@+id/scroll"/>
 
     <ScrollView
             android:layout_width="match_parent"
@@ -41,7 +59,7 @@
             android:orientation="vertical"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/title"
+            app:layout_constraintTop_toBottomOf="@+id/switch_chars"
             app:layout_constraintBottom_toTopOf="@+id/device_buttons">
         <TextView
                 android:layout_width="match_parent"
@@ -83,6 +101,7 @@
                 android:layout_columnWeight="1"
                 android:background="@drawable/button_background"/>
     </GridLayout>
+
 
 </android.support.constraint.ConstraintLayout>
 

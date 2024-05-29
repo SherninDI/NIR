@@ -33,7 +33,7 @@ import java.util.concurrent.Executors;
 
 public class DataActivity extends AppCompatActivity {
     private final String TAG = DataActivity.class.getSimpleName();
-    private Button send, receive, reset;
+    private Button send, receive;
     private RecyclerView groupList;
     private GroupAdapter groupAdapter;
 
@@ -122,7 +122,6 @@ public class DataActivity extends AppCompatActivity {
 
         send = findViewById(R.id.send);
         receive = findViewById(R.id.receive);
-        reset = findViewById(R.id.reset);
         groupList = findViewById(R.id.group_list);
 
         commandReset();
@@ -158,7 +157,6 @@ public class DataActivity extends AppCompatActivity {
 
         send.setOnClickListener(v -> commandSend());
         receive.setOnClickListener(v -> commandReceive());
-        reset.setOnClickListener(v -> commandReset());
 
         usbManager = (UsbManager) getSystemService(Context.USB_SERVICE);
         UsbDevice usbDevice = findDevice();
@@ -391,18 +389,12 @@ public class DataActivity extends AppCompatActivity {
                 saveGroups();
                 openGroups();
                 return true;
-//            case R.id.action_add:
-//                Intent intent = new Intent(DataActivity.this, GroupDataActivity.class);
-////                intent.putExtra("new", true);
-//                intent.putExtra("group_position", groups.size());
-//                startActivity(intent);
-//                Log.e(TAG, "add group pos " + String.valueOf(groups.size()));
-//                return true;
+            case R.id.action_reset:
+                Toast.makeText(this, "Аппарат сброшен", Toast.LENGTH_SHORT).show();
+                commandReset();
+                return true;
 //            case R.id.action_cancel:
 //                commandCancel();
-//                return true;
-//            case R.id.action_refresh:
-//                refreshGroups();
 //                return true;
         }
         return super.onOptionsItemSelected(item);

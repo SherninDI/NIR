@@ -16,10 +16,10 @@
 <!--            android:id="@+id/action_add"-->
 <!--            android:orderInCategory="1"-->
 <!--            android:title="@string/add_button" />-->
-<!--    <item-->
-<!--            android:id="@+id/action_cancel"-->
-<!--            android:orderInCategory="2"-->
-<!--            android:title="@string/cancel_button" />-->
+    <item
+            android:id="@+id/action_reset"
+            android:orderInCategory="5"
+            android:title="@string/reset_button" />
 
     <item
             android:id="@+id/action_refresh"

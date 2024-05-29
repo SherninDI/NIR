@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<TableLayout  xmlns:android="http://schemas.android.com/apk/res/android"
+              android:layout_width="match_parent"
+              android:layout_height="wrap_content"
+              android:stretchColumns="1,2,3"
+              android:layout_gravity="start"
+              android:background="?android:attr/selectableItemBackground">
+
+    <TableRow>
+
+        <TextView
+                android:id="@+id/tvEptNumber1"
+                android:gravity="start"
+                android:textSize="16sp"
+                android:layout_width="40dp"
+                android:textColor="@color/black"
+                android:layout_marginStart="1dp"/>
+
+        <TextView
+                android:id="@+id/tvEptValue1"
+                android:textSize="16sp"
+                android:layout_width="30dp"
+                android:textColor="@color/black"
+                android:layout_marginStart="5dp"/>
+
+        <TextView
+                android:id="@+id/tvEptName1"
+                android:textColor="@color/black"
+                android:layout_width="200dp"
+                android:textSize="16sp"
+                android:layout_marginStart="5dp"/>
+    </TableRow>
+
+</TableLayout>

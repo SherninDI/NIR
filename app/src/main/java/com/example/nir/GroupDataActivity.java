@@ -1,6 +1,9 @@
 package com.example.nir;
 
+
+import android.app.Activity;
 import android.app.AlertDialog;
+import android.app.Instrumentation;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
@@ -15,6 +18,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 import androidx.navigation.NavArgument;
@@ -38,11 +42,14 @@ public class GroupDataActivity extends AppCompatActivity  {
     private final String FILE_NAME = "groups.grf";
     private final String SAVE_FILE_NAME = "save.grf";
     private final String POSITION = "group_position";
+    private static final String FLAG = "flag";
     private AppBarConfiguration appBarConfiguration;
     private ActivityGroupDataBinding binding;
 
     private int position;
     private String name;
+
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -50,7 +57,6 @@ public class GroupDataActivity extends AppCompatActivity  {
         binding = ActivityGroupDataBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
         BottomNavigationView bottomNavigationView = findViewById(R.id.bottom_navigation_view);
-
         TextView titleGroup = findViewById(R.id.group_title);
 
         setSupportActionBar(binding.toolbar);
@@ -72,6 +78,7 @@ public class GroupDataActivity extends AppCompatActivity  {
                 destination.addArgument(POSITION, argument);
             }
         });
+
 
         try {
             File file = new File(this.getFilesDir(), FILE_NAME);
@@ -110,44 +117,83 @@ public class GroupDataActivity extends AppCompatActivity  {
         int id = item.getItemId();
         switch(id){
             case R.id.action_save_group:
-                Toast.makeText(this, "Группа сохранена", Toast.LENGTH_SHORT).show();
                 saveGroup();
+                Toast.makeText(this, "Группа сохранена", Toast.LENGTH_SHORT).show();
+
+//                if (checkTitle()) {
+//
+//                } else {
+//                    AlertDialog.Builder builder = new AlertDialog.Builder(this);
+//                    builder.setMessage("Навзание группы пустое")
+//                            .setTitle("Ошибка")
+//                            .setCancelable(true)
+//                            .setPositiveButton("К названию", new DialogInterface.OnClickListener() {
+//                                public void onClick(DialogInterface dialog, int id) {
+//                                    NavController navController = Navigation.findNavController(GroupDataActivity.this, R.id.nav_host_fragment_content_group_data);
+//                                    navController.navigate(R.id.GroupNameFragment);
+//                                }
+//                            });
+//
+//                    AlertDialog alert = builder.create();
+//                    alert.show();
+//                }
+
                 return true;
             case R.id.action_del_ept:
                 Toast.makeText(this, "Группа удалена", Toast.LENGTH_SHORT).show();
                 deleteGroup();
                 return true;
             case R.id.action_group_list:
+                if (checkTitle()) {
 
-                AlertDialog.Builder builder = new AlertDialog.Builder(this);
+                    AlertDialog.Builder builder = new AlertDialog.Builder(this);
+                    builder.setMessage("Сохранить группу перед переходом?")
+                            .setTitle("Сохранение")
+                            .setCancelable(true)
+                            .setNeutralButton("Отмена", new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialog, int id) {
+                                    dialog.cancel();
+                                }
+                            })
+                            .setNegativeButton("Нет", new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialog, int id) {
+                                    Intent intent = new Intent(GroupDataActivity.this, DataActivity.class);
+                                    setResult(RESULT_OK, intent);
+                                    finish();
+                                }
+                            })
+                            .setPositiveButton("Да", new DialogInterface.OnClickListener() {
+                                public void onClick(DialogInterface dialog, int id) {
+                                    saveGroup();
+                                    Intent intent = new Intent(GroupDataActivity.this, DataActivity.class);
+                                    setResult(RESULT_OK, intent);
+                                    finish();
+//                                Intent intent = new Intent(GroupDataActivity.this, DataActivity.class);
+//                                startActivity(intent);
+                                }
+                            });
 
-                builder.setMessage("Сохранить группу перед переходом?")
-                        .setTitle("Сохранение")
-                        .setCancelable(true)
-                        .setNeutralButton("Отмена", new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialog, int id) {
-                                dialog.cancel();
-                            }
-                        })
-                        .setNegativeButton("Нет", new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialog, int id) {
-                                Intent intent = new Intent(GroupDataActivity.this, DataActivity.class);
-                                startActivity(intent);
-                            }
-                        })
-                        .setPositiveButton("Да", new DialogInterface.OnClickListener() {
-                            public void onClick(DialogInterface dialog, int id) {
-                                saveGroup();
-                                Intent intent = new Intent(GroupDataActivity.this, DataActivity.class);
-                                startActivity(intent);
-                            }
-                        });
+                    AlertDialog alert = builder.create();
 
-                AlertDialog alert = builder.create();
+                    alert.show();
+                } else {
+                    AlertDialog.Builder builder = new AlertDialog.Builder(this);
+                    builder.setMessage("Название группы пустое")
+                            .setTitle("Ошибка")
+                            .setCancelable(true)
+                            .setPositiveButton("К названию", new DialogInterface.OnClickListener() {
+                                public void onClick(DialogInterface dialog, int id) {
+                                    NavController navController = Navigation.findNavController(GroupDataActivity.this, R.id.nav_host_fragment_content_group_data);
+                                    navController.navigate(R.id.GroupNameFragment);
+                                }
+                            });
 
-                alert.show();
+                    AlertDialog alert = builder.create();
+                    alert.show();
+                }
+
                 return true;
         }
         return super.onOptionsItemSelected(item);
@@ -172,6 +218,26 @@ public class GroupDataActivity extends AppCompatActivity  {
         }
     }
 
+    public boolean checkTitle() {
+        byte[] group = new byte[512];
+        GroupFormat groupFormat;
+        File file = new File(this.getFilesDir(), SAVE_FILE_NAME);
+        FileHandler fileHandler = new FileHandler(file);
+        try {
+            group = fileHandler.readBytesFromPosition(position);
+            groupFormat = new GroupFormat(group);
+
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+        fileHandler.close();
+        if (groupFormat.readTitleLength() == 0) {
+            return false;
+        } else {
+            return true;
+        }
+    }
+
 
     public void deleteGroup() {
         byte[] group = new byte[512];
@@ -190,7 +256,8 @@ public class GroupDataActivity extends AppCompatActivity  {
         }
         fileHandler.close();
         Intent intent = new Intent(this, DataActivity.class);
-        startActivity(intent);
+        setResult(RESULT_OK, intent);
+        finish();
 
     }
     

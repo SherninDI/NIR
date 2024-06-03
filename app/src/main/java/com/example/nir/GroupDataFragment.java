@@ -133,6 +133,9 @@ public class GroupDataFragment extends Fragment {
                             eptNameAdapter.notifyDataSetChanged();
                             eptNameAdapter.setOnEptNameClickListener((pos, itemView) -> {
                                 editEpt(pos,  dialog, groupFormat);
+                                eptNameAdapter = new EptNameAdapter(getActivity(), ept);
+                                eptList.setAdapter(eptNameAdapter);
+                                eptNameAdapter.notifyDataSetChanged();
                             });
                         }
                     }
@@ -150,6 +153,9 @@ public class GroupDataFragment extends Fragment {
                             eptAdapter.notifyDataSetChanged();
                             eptAdapter.setOnEptClickListener((pos, itemView) -> {
                                 editEpt(pos,  dialog, groupFormat);
+                                eptAdapter = new EptAdapter(getActivity(), ept);
+                                eptList.setAdapter(eptAdapter);
+                                eptAdapter.notifyDataSetChanged();
                             });
                         }
                     }

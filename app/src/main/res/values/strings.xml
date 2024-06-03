@@ -86,7 +86,7 @@
     <string name="search_text">Введите название или код</string>
     <string name="ampl">Амплитуда</string>
     <string name="step">Время шага</string>
-    <string name="received">Группы получены! Обновите группы</string>
+    <string name="received">Группы получены!</string>
 
 
     <!-- Strings used for fragments for navigation -->

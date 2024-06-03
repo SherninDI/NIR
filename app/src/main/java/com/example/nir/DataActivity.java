@@ -45,6 +45,7 @@ public class DataActivity extends AppCompatActivity {
 
     private final String POSITION = "group_position";
     private static final String FILE_NAME = "groups.grf";
+    private static final String FLAG = "flag";
     private static final String SAVE_FILE_NAME = "save.grf";
     private static final String ACTION_USB_PERMISSION = "com.android.example.USB_PERMISSION";
     private final ExecutorService mExecutor = Executors.newSingleThreadExecutor();
@@ -101,13 +102,34 @@ public class DataActivity extends AppCompatActivity {
         return null;
     }
 
+    String flag;
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (data == null) {return;}
+        openGroups();
+        saveGroups();
+        if (groups.size() != 0) {
+            groupAdapter = new GroupAdapter(getApplicationContext(), groups);
+            groupList.setAdapter(groupAdapter);
+            groupAdapter.notifyDataSetChanged();
+            groupAdapter.setOnGroupClickListener(new GroupAdapter.GroupClickListener() {
+                @Override
+                public void onGroupClick(int position, View itemView) {
+                    TextView textView = (TextView) itemView.findViewById(R.id.tvGroupName) ;
+                    Intent intent = new Intent(DataActivity.this, GroupDataActivity.class);
+                    intent.putExtra(POSITION, position);
+                    startActivityForResult(intent, 1);
+                }
+            });
+        }
+    }
+
     Timer timer = new Timer();
     TimerTask timerTask = new TimerTask() {
         @Override
         public void run() {
             commandsHandler.obtainMessage(Constants.SYS_NOP).sendToTarget();
             if (counter == groupDataBuffer.array().length) {
-                writeGroups();
                 counter = 0;
             }
         }
@@ -132,28 +154,6 @@ public class DataActivity extends AppCompatActivity {
         groupDataBuffer = ByteBuffer.wrap(groupData);
 
         commandFormat = new CommandFormat();
-        openGroups();
-        if (groups.size() != 0) {
-
-            groupAdapter = new GroupAdapter(getApplicationContext(), groups);
-            groupList.setAdapter(groupAdapter);
-            groupAdapter.notifyDataSetChanged();
-            groupAdapter.setOnGroupClickListener(new GroupAdapter.GroupClickListener() {
-                @Override
-                public void onGroupClick(int position, View itemView) {
-                    TextView textView = (TextView) itemView.findViewById(R.id.tvGroupName) ;
-                    Intent intent = new Intent(DataActivity.this, GroupDataActivity.class);
-                    intent.putExtra(POSITION, position);
-//                    intent.putExtra("new", false);
-//                    intent.putExtra("name", textView.getText().toString());
-                    startActivity(intent);
-
-                    Log.e(TAG,"click group pos " + position);
-                }
-            });
-        } else {
-
-        }
 
         send.setOnClickListener(v -> commandSend());
         receive.setOnClickListener(v -> commandReceive());
@@ -220,7 +220,7 @@ public class DataActivity extends AppCompatActivity {
             FileHandler fileHandler = new FileHandler(file);
             byte[] groupsBytes = fileHandler.readBytes(51200);
             commandsHandler.obtainMessage(Constants.SYS_PUT, groupsByte.length,-1, groupsBytes).sendToTarget();
-            Toast.makeText(getApplicationContext(), "Данные отправлены", Toast.LENGTH_SHORT).show();
+            Toast.makeText(getApplicationContext(), "Данные отправлены", Toast.LENGTH_LONG).show();
             fileHandler.close();
         } catch (IOException e) {
             e.printStackTrace();
@@ -247,9 +247,21 @@ public class DataActivity extends AppCompatActivity {
         } catch (IOException e) {
             e.printStackTrace();
         }
-        groupAdapter = new GroupAdapter(getApplicationContext(), groups);
-        groupList.setAdapter(groupAdapter);
-        groupAdapter.notifyDataSetChanged();
+        if (groups.size() != 0) {
+            groupAdapter = new GroupAdapter(getApplicationContext(), groups);
+            groupList.setAdapter(groupAdapter);
+            groupAdapter.notifyDataSetChanged();
+            groupAdapter.setOnGroupClickListener(new GroupAdapter.GroupClickListener() {
+                @Override
+                public void onGroupClick(int position, View itemView) {
+                    TextView textView = (TextView) itemView.findViewById(R.id.tvGroupName) ;
+                    Intent intent = new Intent(DataActivity.this, GroupDataActivity.class);
+                    intent.putExtra(POSITION, position);
+                    startActivityForResult(intent, 1);
+//                    startActivity(intent);
+                }
+            });
+        }
     }
 
     public void saveGroups() {
@@ -301,15 +313,27 @@ public class DataActivity extends AppCompatActivity {
 
             Toast.makeText(this, ex.getMessage(), Toast.LENGTH_SHORT).show();
         }
-        groupAdapter = new GroupAdapter(getApplicationContext(), groups);
-        groupList.setAdapter(groupAdapter);
-        groupAdapter.notifyDataSetChanged();
+        if (groups.size() != 0) {
+            groupAdapter = new GroupAdapter(getApplicationContext(), groups);
+            groupList.setAdapter(groupAdapter);
+            groupAdapter.notifyDataSetChanged();
+            groupAdapter.setOnGroupClickListener(new GroupAdapter.GroupClickListener() {
+                @Override
+                public void onGroupClick(int position, View itemView) {
+                    TextView textView = (TextView) itemView.findViewById(R.id.tvGroupName) ;
+                    Intent intent = new Intent(DataActivity.this, GroupDataActivity.class);
+                    intent.putExtra(POSITION, position);
+                    startActivityForResult(intent, 1);
+//                    startActivity(intent);
+                }
+            });
+        }
     }
-//    public void refreshGroups() {
+    public void receiveGroups() {
 //        readGroups();
 //        showGroups();
-//    }
-//
+    }
+
 
 
 
@@ -339,6 +363,8 @@ public class DataActivity extends AppCompatActivity {
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
+//        saveGroups();
+//        openGroups();
     }
 //
 //    public void showGroups() {
@@ -384,11 +410,11 @@ public class DataActivity extends AppCompatActivity {
                 Toast.makeText(this, "Файл сохранен", Toast.LENGTH_SHORT).show();
                 saveGroups();
                 return true;
-            case R.id.action_refresh:
-                Toast.makeText(this, "Группы обновлены", Toast.LENGTH_SHORT).show();
-                saveGroups();
-                openGroups();
-                return true;
+//            case R.id.action_refresh:
+//                Toast.makeText(this, "Группы обновлены", Toast.LENGTH_SHORT).show();
+//                saveGroups();
+//                openGroups();
+//                return true;
             case R.id.action_reset:
                 Toast.makeText(this, "Аппарат сброшен", Toast.LENGTH_SHORT).show();
                 commandReset();
@@ -458,7 +484,26 @@ public class DataActivity extends AppCompatActivity {
 //                        Log.i(TAG, "SYS_DATA " + bytesToHex(res) + " " + counter);
 //                        Log.i(TAG, String.valueOf(counter));
                         if (counter == groupDataBuffer.array().length) {
-                            Toast.makeText(getApplicationContext(), R.string.received, Toast.LENGTH_SHORT).show();
+                            writeGroups();
+                            saveGroups();
+                            openGroups();
+                            if (groups.size() != 0) {
+                                groupAdapter = new GroupAdapter(getApplicationContext(), groups);
+                                groupList.setAdapter(groupAdapter);
+                                groupAdapter.notifyDataSetChanged();
+                                groupAdapter.setOnGroupClickListener(new GroupAdapter.GroupClickListener() {
+                                    @Override
+                                    public void onGroupClick(int position, View itemView) {
+                                        TextView textView = (TextView) itemView.findViewById(R.id.tvGroupName) ;
+                                        Intent intent = new Intent(DataActivity.this, GroupDataActivity.class);
+                                        intent.putExtra(POSITION, position);
+                                        startActivityForResult(intent, 1);
+//                                        startActivity(intent);
+                                    }
+                                });
+                            }
+                            Toast.makeText(getApplicationContext(), R.string.received, Toast.LENGTH_LONG).show();
+                            counter = 0;
                         }
                         break;
                     default: break;

@@ -21,9 +21,9 @@
             android:orderInCategory="5"
             android:title="@string/reset_button" />
 
-    <item
-            android:id="@+id/action_refresh"
-            android:orderInCategory="1"
-            android:title="@string/refresh_groups_button" />
+<!--    <item-->
+<!--            android:id="@+id/action_refresh"-->
+<!--            android:orderInCategory="1"-->
+<!--            android:title="@string/refresh_groups_button" />-->
 
 </menu>

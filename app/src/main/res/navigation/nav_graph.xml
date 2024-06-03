@@ -3,7 +3,7 @@
             xmlns:app="http://schemas.android.com/apk/res-auto"
             xmlns:tools="http://schemas.android.com/tools"
             android:id="@+id/nav_graph"
-            app:startDestination="@id/GroupNameFragment">
+            app:startDestination="@id/GroupDataFragment">
 
     <fragment
             android:id="@+id/GroupNameFragment"
@@ -19,6 +19,8 @@
             android:label="@string/tab2_label"
             tools:layout="@layout/fragment_group_data">
 
+        <action android:id="@+id/action_GroupDataFragment_to_GroupNameFragment"
+                app:destination="@id/GroupNameFragment"/>
     </fragment>
 
     <fragment

@@ -240,7 +240,7 @@ public class DataActivity extends AppCompatActivity {
                 groupFormat.writeFileId();
                 groupFormat.writeCRC();
                 fileHandler.writeBytesToPosition(group, i);
-                groups.add("Группа " + i);
+                groups.add("Группа " + (i + 1));
             }
 
             fileHandler.close();
@@ -302,7 +302,7 @@ public class DataActivity extends AppCompatActivity {
                             " " + "(" + groupFormat.readStepCount() + ")";
                     groups.add(title);
                 } else {
-                    String emptyTitle = "Группа" + " " + i;
+                    String emptyTitle = "Группа" + " " + (i + 1);
                     groups.add(emptyTitle);
                 }
             }

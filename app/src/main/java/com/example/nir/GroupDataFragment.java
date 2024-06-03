@@ -104,10 +104,12 @@ public class GroupDataFragment extends Fragment {
 
         if (ept.size() != 0) {
             eptAdapter = new EptAdapter(getActivity(), ept);
+            eptNameAdapter = new EptNameAdapter(getActivity(), ept);
             eptList.setAdapter(eptAdapter);
-            eptAdapter.notifyDataSetChanged();
+
             eptAdapter.setOnEptClickListener((pos, itemView) -> {
                 editEpt(pos,  dialog, groupFormat);
+                eptList.getAdapter().notifyDataSetChanged();
             });
         }
         switchCompat.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
@@ -126,38 +128,33 @@ public class GroupDataFragment extends Fragment {
                         TextView eptTime = row.findViewById(R.id.tvEptTime);
                         eptTime.setText("");
                         openEpt();
-
+                        eptList.setAdapter(eptNameAdapter);
                         if (ept.size() != 0) {
-                            eptNameAdapter = new EptNameAdapter(getActivity(), ept);
-                            eptList.setAdapter(eptNameAdapter);
-                            eptNameAdapter.notifyDataSetChanged();
+
                             eptNameAdapter.setOnEptNameClickListener((pos, itemView) -> {
                                 editEpt(pos,  dialog, groupFormat);
-                                eptNameAdapter = new EptNameAdapter(getActivity(), ept);
-                                eptList.setAdapter(eptNameAdapter);
-                                eptNameAdapter.notifyDataSetChanged();
+
                             });
                         }
+
                     }
                     else {
+
                         TextView eptAmpl = row.findViewById(R.id.tvEptAmpl);
                         eptAmpl.setText(R.string.col_ampl);
                         TextView eptTime = row.findViewById(R.id.tvEptTime);
                         eptTime.setText(R.string.col_time);
                         openEpt();
-
-
+                        eptList.setAdapter(eptAdapter);
                         if (ept.size() != 0) {
-                            eptAdapter = new EptAdapter(getActivity(), ept);
-                            eptList.setAdapter(eptAdapter);
-                            eptAdapter.notifyDataSetChanged();
                             eptAdapter.setOnEptClickListener((pos, itemView) -> {
                                 editEpt(pos,  dialog, groupFormat);
-                                eptAdapter = new EptAdapter(getActivity(), ept);
-                                eptList.setAdapter(eptAdapter);
-                                eptAdapter.notifyDataSetChanged();
+
                             });
                         }
+
+
+
                     }
                 }
             }
@@ -196,6 +193,7 @@ public class GroupDataFragment extends Fragment {
             groupFormat.writeCRC();
             saveEpt(groupFormat.getBytes());
             openEpt();
+            eptList.getAdapter().notifyDataSetChanged();
             dialog.dismiss();
         });
         dialog.getButton(AlertDialog.BUTTON_NEGATIVE).setOnClickListener(v -> {
@@ -219,7 +217,7 @@ public class GroupDataFragment extends Fragment {
             }
             fileHandler1.close();
             ept.remove(pos);
-            eptAdapter.notifyDataSetChanged();
+            eptList.getAdapter().notifyDataSetChanged();
             dialog.dismiss();
         });
     }

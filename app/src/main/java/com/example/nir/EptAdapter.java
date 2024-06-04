@@ -1,15 +1,15 @@
 package com.example.nir;
 
 import android.content.Context;
+import android.content.res.Resources;
 import android.graphics.Color;
-import android.support.v7.widget.RecyclerView;
+import androidx.recyclerview.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
 import java.util.ArrayList;
-import java.util.List;
 
 public class EptAdapter extends RecyclerView.Adapter<EptAdapter.ViewHolder>{
     private final ArrayList<ItemEpt> ept;
@@ -40,7 +40,7 @@ public class EptAdapter extends RecyclerView.Adapter<EptAdapter.ViewHolder>{
         holder.tvEptAmpl.setText(String.valueOf(itemList.getEptAmpl()));
         holder.tvEptTime.setText(String.valueOf(itemList.getEptTime()));
         holder.tvEptValue.setText(itemList.getEptValueText());
-        holder.itemView.setBackgroundColor(selected_position == position ? Color.RED : Color.TRANSPARENT);
+        holder.itemView.setBackgroundColor(selected_position == position ? Color.rgb(187,134,252) : Color.TRANSPARENT);
     }
 
     // total number of rows

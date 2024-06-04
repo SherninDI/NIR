@@ -1,19 +1,16 @@
 package com.example.nir;
 
 import android.app.PendingIntent;
+import android.app.ProgressDialog;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.hardware.usb.*;
-import android.os.Handler;
-import android.os.Looper;
-import android.os.Message;
-import android.support.annotation.NonNull;
-import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
+import android.os.*;
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.recyclerview.widget.RecyclerView;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -21,6 +18,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
+import androidx.swiperefreshlayout.widget.CircularProgressDrawable;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -37,12 +35,15 @@ public class DataActivity extends AppCompatActivity {
     private RecyclerView groupList;
     private GroupAdapter groupAdapter;
 
+    private ProgressDialog progressDialog;
+    private Handler handlerRecv;
+    private Handler handlerSend;
     private List<String> groups = new ArrayList<>();
     private byte[] groupsByte = new byte[51200];
     private byte[] group = new byte[512];
     private int groupSize = 512;
-    int counter = 0;
-
+    int counterRecv = 0;
+    int counterSend = 0;
     private final String POSITION = "group_position";
     private static final String FILE_NAME = "groups.grf";
     private static final String FLAG = "flag";
@@ -129,8 +130,8 @@ public class DataActivity extends AppCompatActivity {
         @Override
         public void run() {
             commandsHandler.obtainMessage(Constants.SYS_NOP).sendToTarget();
-            if (counter == groupDataBuffer.array().length) {
-                counter = 0;
+            if (counterRecv == groupDataBuffer.array().length) {
+                counterRecv = 0;
             }
         }
     };
@@ -155,12 +156,28 @@ public class DataActivity extends AppCompatActivity {
 
         commandFormat = new CommandFormat();
 
-        send.setOnClickListener(v -> commandSend());
+//        send.setOnClickListener(v -> commandSend());
         receive.setOnClickListener(v -> commandReceive());
+        send.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                commandSend();
+
+            }
+        });
 
         usbManager = (UsbManager) getSystemService(Context.USB_SERVICE);
         UsbDevice usbDevice = findDevice();
-        PendingIntent mPermissionIntent = PendingIntent.getBroadcast(this, 0, new Intent(ACTION_USB_PERMISSION), 0);
+
+
+        PendingIntent mPermissionIntent;
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+            mPermissionIntent = PendingIntent.getBroadcast(this, 0, new Intent(ACTION_USB_PERMISSION), PendingIntent.FLAG_MUTABLE);
+        }else {
+            mPermissionIntent = PendingIntent.getBroadcast(this, 0, new Intent(ACTION_USB_PERMISSION), 0);
+        }
+
+//        PendingIntent mPermissionIntent = PendingIntent.getBroadcast(this, 0, new Intent(ACTION_USB_PERMISSION), 0);
         IntentFilter filter = new IntentFilter(ACTION_USB_PERMISSION);
         registerReceiver(usbReceiver, filter);
         if (usbDevice != null) {
@@ -211,6 +228,48 @@ public class DataActivity extends AppCompatActivity {
     }
 
     public void commandReceive() {
+        ProgressDialog progressDialogRecv = new ProgressDialog(DataActivity.this);
+        progressDialogRecv.setMessage("Идет прием...");
+        progressDialogRecv.setTitle("Получение групп");
+        progressDialogRecv.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
+        progressDialogRecv.setMax(100);
+        progressDialogRecv.show();
+        handlerRecv = new Handler(new Handler.Callback() {
+            @Override
+            public boolean handleMessage(@NonNull Message msg) {
+                if (progressDialogRecv.getProgress() < progressDialogRecv.getMax()) {
+                    if (msg.what % groupSize == 0) {
+                        progressDialogRecv.incrementProgressBy(1);
+
+                    }
+                    if (msg.what == groupDataBuffer.array().length) {
+                        progressDialogRecv.dismiss();
+                        writeGroups();
+                        saveGroups();
+                        openGroups();
+
+                        if (groups.size() != 0) {
+                            groupAdapter = new GroupAdapter(getApplicationContext(), groups);
+                            groupList.setAdapter(groupAdapter);
+                            groupAdapter.notifyDataSetChanged();
+                            groupAdapter.setOnGroupClickListener(new GroupAdapter.GroupClickListener() {
+                                @Override
+                                public void onGroupClick(int position, View itemView) {
+                                    TextView textView = (TextView) itemView.findViewById(R.id.tvGroupName) ;
+                                    Intent intent = new Intent(DataActivity.this, GroupDataActivity.class);
+                                    intent.putExtra(POSITION, position);
+                                    startActivityForResult(intent, 1);
+//                                        startActivity(intent);
+                                }
+                            });
+                        }
+                        Toast.makeText(getApplicationContext(), R.string.received, Toast.LENGTH_LONG).show();
+                        counterRecv = 0;
+                    }
+                }
+                return false;
+            }
+        });
         commandsHandler.obtainMessage(Constants.SYS_GET).sendToTarget();
     }
 
@@ -219,13 +278,44 @@ public class DataActivity extends AppCompatActivity {
             File file = new File(this.getFilesDir(), FILE_NAME);
             FileHandler fileHandler = new FileHandler(file);
             byte[] groupsBytes = fileHandler.readBytes(51200);
+
             commandsHandler.obtainMessage(Constants.SYS_PUT, groupsByte.length,-1, groupsBytes).sendToTarget();
-            Toast.makeText(getApplicationContext(), "Данные отправлены", Toast.LENGTH_LONG).show();
+//            Toast.makeText(getApplicationContext(), "Данные отправлены", Toast.LENGTH_LONG).show();
             fileHandler.close();
         } catch (IOException e) {
             e.printStackTrace();
         }
 
+        commandSendProgress();
+        handlerSend = new Handler(new Handler.Callback() {
+            @Override
+            public boolean handleMessage(@NonNull Message msg) {
+                if (progressDialog.getProgress() < progressDialog.getMax()) {
+
+                    if (msg.what % groupSize == 0) {
+                        Log.e("prog", String.valueOf(msg.what));
+                        progressDialog.incrementProgressBy(1);
+                    }
+                    if (msg.what  == groupDataBuffer.array().length) {
+                        Toast.makeText(getApplicationContext(), "Данные отправлены", Toast.LENGTH_LONG).show();
+                        progressDialog.dismiss();
+                    }
+
+                }
+
+                return false;
+            }
+        });
+
+    }
+
+    public void commandSendProgress() {
+        progressDialog = new ProgressDialog(DataActivity.this);
+        progressDialog.setMessage("Идет отправка...");
+        progressDialog.setTitle("Отправка групп");
+        progressDialog.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
+        progressDialog.setMax(100);
+        progressDialog.show();
     }
 
     public void cleanGroups() {
@@ -329,30 +419,7 @@ public class DataActivity extends AppCompatActivity {
             });
         }
     }
-    public void receiveGroups() {
-//        readGroups();
-//        showGroups();
-    }
 
-
-
-
-//    public void readGroups() {
-//        try {
-//            groupsByte = fileHandler.readBytes(51200);
-//            for (int i = 0; i < groupsByte.length / groupSize; i++) {
-//                group = fileHandler.readBytesFromPosition(i);
-//                GroupFormat groupFormat = new GroupFormat(group);
-//                if (groupFormat.readTitleLength() != 0) {
-//                    groups.add(groupFormat.readTitle());
-//                }
-////                Log.i(TAG, i + " " + bytesToHex(group));
-//            }
-//        } catch (IOException e) {
-//            e.printStackTrace();
-//        }
-//    }
-//
     public void writeGroups() {
         try {
             File file = new File(this.getFilesDir(), FILE_NAME);
@@ -366,28 +433,6 @@ public class DataActivity extends AppCompatActivity {
 //        saveGroups();
 //        openGroups();
     }
-//
-//    public void showGroups() {
-//        if (groups.size() != 0) {
-//            groupAdapter = new GroupAdapter(getApplicationContext(), groups);
-//            groupList.setAdapter(groupAdapter);
-//            groupAdapter.notifyDataSetChanged();
-//            groupAdapter.setOnGroupClickListener(new GroupAdapter.GroupClickListener() {
-//                @Override
-//                public void onGroupClick(int position, View itemView) {
-//                    TextView textView = (TextView) itemView.findViewById(R.id.tvGroupName) ;
-//                    Intent intent = new Intent(DataActivity.this, GroupDataActivity.class);
-//                    intent.putExtra("group_position", position);
-////                    intent.putExtra("new", false);
-////                    intent.putExtra("name", textView.getText().toString());
-//                    startActivity(intent);
-//
-//                    Log.e(TAG,"click group pos " + position);
-//                }
-//            });
-//        }
-//    }
-
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
@@ -410,11 +455,6 @@ public class DataActivity extends AppCompatActivity {
                 Toast.makeText(this, "Файл сохранен", Toast.LENGTH_SHORT).show();
                 saveGroups();
                 return true;
-//            case R.id.action_refresh:
-//                Toast.makeText(this, "Группы обновлены", Toast.LENGTH_SHORT).show();
-//                saveGroups();
-//                openGroups();
-//                return true;
             case R.id.action_reset:
                 Toast.makeText(this, "Аппарат сброшен", Toast.LENGTH_SHORT).show();
                 commandReset();
@@ -457,8 +497,6 @@ public class DataActivity extends AppCompatActivity {
 
 
     private void updateReceivedData(byte[] data) {
-
-
         int blockSize = 11;
         int blockCount = data.length / blockSize;
 
@@ -469,7 +507,6 @@ public class DataActivity extends AppCompatActivity {
 
                 switch (range[1]) {
                     case (byte) Constants.SYS_STAT:
-
                         break;
                     case (byte) Constants.SYS_RUN:
                         Log.i(TAG, "SYS_RUN " + bytesToHex(range));
@@ -479,32 +516,9 @@ public class DataActivity extends AppCompatActivity {
                         break;
                     case (byte) Constants.SYS_DATA:
                         byte[] res = Arrays.copyOfRange(range,2,10);
-                        counter += res.length;
+                        counterRecv += res.length;
+                        handlerRecv.obtainMessage(counterRecv).sendToTarget();
                         groupDataBuffer.put(res);
-//                        Log.i(TAG, "SYS_DATA " + bytesToHex(res) + " " + counter);
-//                        Log.i(TAG, String.valueOf(counter));
-                        if (counter == groupDataBuffer.array().length) {
-                            writeGroups();
-                            saveGroups();
-                            openGroups();
-                            if (groups.size() != 0) {
-                                groupAdapter = new GroupAdapter(getApplicationContext(), groups);
-                                groupList.setAdapter(groupAdapter);
-                                groupAdapter.notifyDataSetChanged();
-                                groupAdapter.setOnGroupClickListener(new GroupAdapter.GroupClickListener() {
-                                    @Override
-                                    public void onGroupClick(int position, View itemView) {
-                                        TextView textView = (TextView) itemView.findViewById(R.id.tvGroupName) ;
-                                        Intent intent = new Intent(DataActivity.this, GroupDataActivity.class);
-                                        intent.putExtra(POSITION, position);
-                                        startActivityForResult(intent, 1);
-//                                        startActivity(intent);
-                                    }
-                                });
-                            }
-                            Toast.makeText(getApplicationContext(), R.string.received, Toast.LENGTH_LONG).show();
-                            counter = 0;
-                        }
                         break;
                     default: break;
                 }
@@ -548,12 +562,16 @@ public class DataActivity extends AppCompatActivity {
 
                     int blockSize = 8;
                     int blockCount = buf.length / blockSize;
+
                     for (int i = 0; i < blockCount; i++) {
                         int idx = i * blockSize;
+                        int progress = (i + 1) * blockSize;
                         byte[] range = Arrays.copyOfRange(buf, idx, idx + blockSize);
-//                        Log.e(TAG, "SYS_PUT " + bytesToHex(range) + " " + idx);
-                        commandsHandler.obtainMessage(Constants.SYS_DATA, idx,0, range).sendToTarget();
+//                        handlerSend.obtainMessage(progress).sendToTarget();
+
+                        commandsHandler.obtainMessage(Constants.SYS_DATA, progress,0, range).sendToTarget();
                     }
+
                     break;
                 case Constants.SYS_GET:
                     command = commandFormat.getCommand(Constants.SYS_GET, data);
@@ -568,6 +586,9 @@ public class DataActivity extends AppCompatActivity {
                 case Constants.SYS_DATA:
                     command = commandFormat.getCommand(Constants.SYS_DATA, (byte[])message.obj);
                     sendMessage(command);
+                    if (message.arg1 % groupSize == 0) {
+                        handlerSend.sendEmptyMessageDelayed(message.arg1, 4000);
+                    }
                     Log.e(TAG, "SYS_DATA " + bytesToHex(command) + " " + message.arg1);
                     break;
             }

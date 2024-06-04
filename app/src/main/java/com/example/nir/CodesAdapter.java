@@ -2,14 +2,13 @@ package com.example.nir;
 
 import android.content.Context;
 import android.graphics.Color;
-import android.support.v7.widget.RecyclerView;
+import androidx.recyclerview.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
 import java.util.ArrayList;
-import java.util.List;
 
 public class CodesAdapter extends RecyclerView.Adapter<CodesAdapter.ViewHolder>{
     private final ArrayList<ItemEpt> ept;
@@ -36,7 +35,7 @@ public class CodesAdapter extends RecyclerView.Adapter<CodesAdapter.ViewHolder>{
         final ItemEpt itemList = ept.get(position);
         holder.tvEptName.setText(itemList.getEptNameText());
         holder.tvEptValue.setText(itemList.getEptValueText());
-        holder.itemView.setBackgroundColor(selected_position == position ? Color.RED : Color.TRANSPARENT);
+        holder.itemView.setBackgroundColor(selected_position == position ? Color.rgb(187,134,252) : Color.TRANSPARENT);
     }
 
     // total number of rows

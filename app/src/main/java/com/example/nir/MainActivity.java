@@ -1,28 +1,20 @@
 package com.example.nir;
 
-import android.app.PendingIntent;
-import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
-import android.content.IntentFilter;
 import android.hardware.usb.*;
-import android.support.v7.app.AppCompatActivity;
+import android.widget.Toast;
+import androidx.appcompat.app.AppCompatActivity;
 import android.os.Bundle;
-import android.support.v7.widget.SwitchCompat;
-import android.text.method.ScrollingMovementMethod;
-import android.util.Log;
+import androidx.appcompat.widget.SwitchCompat;
 import android.view.View;
 import android.widget.Button;
 import android.widget.CompoundButton;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import java.io.File;
 import java.io.IOException;
 import java.util.HashMap;
-import java.util.Iterator;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 
 public class MainActivity extends AppCompatActivity {
     private final String TAG = MainActivity.class.getSimpleName();
@@ -64,9 +56,11 @@ public class MainActivity extends AppCompatActivity {
                 if (usbDevice != null) {
                     Intent intent = new Intent(getApplicationContext(), DataActivity.class);
                     startActivity(intent);
+                } else {
+                    Toast.makeText(getApplicationContext(), "Устройство не подключено", Toast.LENGTH_LONG).show();
                 }
-                Intent intent = new Intent(getApplicationContext(), DataActivity.class);
-                startActivity(intent);
+//                Intent intent = new Intent(getApplicationContext(), DataActivity.class);
+//                startActivity(intent);
             }
         });
 
